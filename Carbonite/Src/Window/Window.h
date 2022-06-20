@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Utils/Event.h"
+
 #include <cstdint>
 
 #include <string>
@@ -46,6 +48,12 @@ private:
 	static void CursorPosCallback(GLFWwindow* window, double x, double y);
 	static void ScrollCallback(GLFWwindow* window, double x, double y);
 	static void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
+
+public:
+	Utils::Event<std::int32_t, std::int32_t>   e_Pos;
+	Utils::Event<std::uint32_t, std::uint32_t> e_Size;
+	Utils::Event<std::uint32_t, std::uint32_t> e_FBSize;
+	Utils::Event<EWindowState>                 e_State;
 
 public:
 	Window(std::uint32_t width = 1280, std::uint32_t height = 720, const std::string& title = "Carbonite");

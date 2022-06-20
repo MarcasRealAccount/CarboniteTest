@@ -38,6 +38,8 @@ void Window::PosCallback(GLFWwindow* window, int x, int y)
 {
 	Window* wnd = static_cast<Window*>(glfwGetWindowUserPointer(window));
 
+	if (wnd->m_Data.m_X != x || wnd->m_Data.m_Y != y)
+		wnd->e_Pos(x, y);
 	wnd->m_Data.m_X = x;
 	wnd->m_Data.m_Y = y;
 }
@@ -46,6 +48,8 @@ void Window::SizeCallback(GLFWwindow* window, int width, int height)
 {
 	Window* wnd = static_cast<Window*>(glfwGetWindowUserPointer(window));
 
+	if (wnd->m_Data.m_Width != width || wnd->m_Data.m_Height != height)
+		wnd->e_Size(static_cast<std::uint32_t>(width), static_cast<std::uint32_t>(height));
 	wnd->m_Data.m_Width  = width;
 	wnd->m_Data.m_Height = height;
 }
@@ -55,9 +59,15 @@ void Window::IconifyCallback(GLFWwindow* window, int iconified)
 	Window* wnd = static_cast<Window*>(glfwGetWindowUserPointer(window));
 
 	if (iconified)
+	{
+		wnd->e_State(EWindowState::Iconified);
 		wnd->m_Data.m_State = EWindowState::Iconified;
+	}
 	else if (wnd->m_Data.m_State == EWindowState::Iconified)
+	{
+		wnd->e_State(EWindowState::Normal);
 		wnd->m_Data.m_State = EWindowState::Normal;
+	}
 }
 
 void Window::MaximizeCallback(GLFWwindow* window, int maximized)
@@ -65,15 +75,23 @@ void Window::MaximizeCallback(GLFWwindow* window, int maximized)
 	Window* wnd = static_cast<Window*>(glfwGetWindowUserPointer(window));
 
 	if (maximized)
+	{
+		wnd->e_State(EWindowState::Maximized);
 		wnd->m_Data.m_State = EWindowState::Maximized;
+	}
 	else if (wnd->m_Data.m_State == EWindowState::Maximized)
+	{
+		wnd->e_State(EWindowState::Normal);
 		wnd->m_Data.m_State = EWindowState::Normal;
+	}
 }
 
 void Window::FBSizeCallback(GLFWwindow* window, int fbWidth, int fbHeight)
 {
 	Window* wnd = static_cast<Window*>(glfwGetWindowUserPointer(window));
 
+	if (wnd->m_Data.m_FBWidth != fbWidth || wnd->m_Data.m_FBHeight != fbHeight)
+		wnd->e_FBSize(static_cast<std::uint32_t>(fbWidth), static_cast<std::uint32_t>(fbHeight));
 	wnd->m_Data.m_FBWidth  = fbWidth;
 	wnd->m_Data.m_FBHeight = fbHeight;
 }
@@ -190,6 +208,7 @@ void Window::restore()
 				glfwMaximizeWindow(m_Native);
 				break;
 			default:
+				e_State(m_PData.m_State);
 				m_Data.m_State = m_PData.m_State;
 				break;
 			}
@@ -241,6 +260,7 @@ void Window::fullscreen()
 		glfwSetWindowMonitor(m_Native, monitor, 0, 0, vidmode->width, vidmode->height, vidmode->refreshRate);
 	}
 
+	e_State(EWindowState::Fullscreen);
 	m_Data.m_State = EWindowState::Fullscreen;
 }
 
