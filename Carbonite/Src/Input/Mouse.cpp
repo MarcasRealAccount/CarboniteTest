@@ -5,8 +5,8 @@ namespace Input
 {
 	void Mouse::update()
 	{
-		m_Axises[Axises::MouseScrollX] = 0.0f;
-		m_Axises[Axises::MouseScrollY] = 0.0f;
+		m_Axes[Axes::MouseWheelX] = 0.0f;
+		m_Axes[Axes::MouseWheelY] = 0.0f;
 
 		for (std::size_t i = 0; i < s_MaxMouseButtons; ++i)
 		{
@@ -21,7 +21,7 @@ namespace Input
 	void Mouse::setAxis(std::uint32_t axis, float value)
 	{
 		if (axis < 4)
-			m_Axises[axis] = value;
+			m_Axes[axis] = value;
 	}
 
 	void Mouse::buttonPressed(std::uint32_t button)
@@ -36,27 +36,27 @@ namespace Input
 			m_Buttons[button] |= ButtonStates::ReleasedMask;
 	}
 
-	float Mouse::getAxis(std::uint32_t axis)
+	float Mouse::getAxis(std::uint32_t axis) const
 	{
-		return axis < 4 ? m_Axises[axis] : 0.0f;
+		return axis < 4 ? m_Axes[axis] : 0.0f;
 	}
 
-	std::uint8_t Mouse::getState(std::uint32_t button)
+	std::uint8_t Mouse::getState(std::uint32_t button) const
 	{
 		return button < s_MaxMouseButtons ? m_Buttons[button] : 0;
 	}
 
-	bool Mouse::isButtonPressed(std::uint32_t button)
+	bool Mouse::isButtonPressed(std::uint32_t button) const
 	{
 		return button < s_MaxMouseButtons ? m_Buttons[button] & ButtonStates::PressedMask : false;
 	}
 
-	bool Mouse::isButtonReleased(std::uint32_t button)
+	bool Mouse::isButtonReleased(std::uint32_t button) const
 	{
 		return button < s_MaxMouseButtons ? m_Buttons[button] & ButtonStates::ReleasedMask : false;
 	}
 
-	bool Mouse::isButtonDown(std::uint32_t button)
+	bool Mouse::isButtonDown(std::uint32_t button) const
 	{
 		return button < s_MaxMouseButtons ? m_Buttons[button] & ButtonStates::DownMask : false;
 	}

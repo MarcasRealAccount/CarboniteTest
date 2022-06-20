@@ -14,9 +14,49 @@ void Carbonite::Destroy()
 	delete &Get();
 }
 
+void Carbonite::GLFWJoystickCallback(int jid, int event)
+{
+	auto& inputs = Input::Inputs::Get();
+
+	if (event == GLFW_CONNECTED)
+	{
+		bool          gamepad = glfwJoystickIsGamepad(jid);
+		std::uint32_t axes    = 0;
+		std::uint32_t buttons = 0;
+		if (gamepad)
+		{
+			axes    = 6;
+			buttons = 15;
+		}
+		else
+		{
+			int axisCount;
+			int buttonCount;
+
+			[[maybe_unused]] auto a = glfwGetJoystickAxes(jid, &axisCount);
+			[[maybe_unused]] auto b = glfwGetJoystickButtons(jid, &buttonCount);
+
+			axes    = static_cast<std::uint32_t>(axisCount);
+			buttons = static_cast<std::uint32_t>(buttonCount);
+		}
+		inputs.joystickConnect(jid, jid + 1, axes, buttons, gamepad);
+
+		Log::Debug("{} connected: {}, \"{}\"", gamepad ? "Gamepad" : "Joystick", jid + 1, glfwGetJoystickName(jid));
+	}
+	else if (event == GLFW_DISCONNECTED)
+	{
+		bool gamepad = inputs.getJoysticks()[jid].isGamepad();
+		inputs.joystickDisconnect(jid);
+
+		Log::Debug("{} disconnected: {}", gamepad ? "Gamepad" : "Joystick", jid + 1);
+	}
+}
+
 void Carbonite::init()
 {
 	Log::Trace("Init");
+
+	initJoysticks();
 
 	m_Instance = Renderer::SelectRHI();
 	m_Surface  = m_Instance->createSurface(m_Window);
@@ -36,6 +76,11 @@ void Carbonite::init()
 	                                   Input::Binding { Input::EInputLocation::Keyboard, 0, Input::Buttons::KeyA },
 	                                   Input::Binding { Input::EInputLocation::Keyboard, 0, Input::Buttons::KeyE },
 	                                   Input::Binding { Input::EInputLocation::Keyboard, 0, Input::Buttons::KeyQ });
+	Input::RegisterAxis2DBinding("onFoot",
+	                             "turn",
+	                             Input::Binding { Input::EInputLocation::Gamepad, 0, Input::Axes::GamepadRightX },
+	                             Input::Binding { Input::EInputLocation::Gamepad, 0, Input::Axes::GamepadRightY },
+	                             Input::EAxisMode::Relative);
 }
 
 void Carbonite::run()
@@ -55,6 +100,7 @@ void Carbonite::run()
 		}
 
 		Log::Debug("Movement {}", Input::Axis3D("onFoot", "movement"));
+		Log::Debug("Turn     {}", Input::Axis2D("onFoot", "turn"));
 
 		m_Device->beginRendering();
 
@@ -62,6 +108,7 @@ void Carbonite::run()
 
 		Input::Inputs::Get().updateGrouped();
 		glfwPollEvents();
+		updateJoysticks();
 		Input::Inputs::Get().postUpdateGrouped();
 
 		if (Input::Button("close"))
@@ -77,6 +124,113 @@ void Carbonite::deinit()
 	m_Window.destroy();
 	m_Surface->destroy();
 	m_Instance->destroy();
+}
+
+void Carbonite::initJoysticks()
+{
+	Log::Trace("Init Joysticks");
+
+	std::vector<Input::Joystick> joysticks;
+	joysticks.reserve(16);
+
+	for (std::uint32_t i = 0; i < 16; ++i)
+	{
+		auto& joystick = joysticks.emplace_back();
+		if (glfwJoystickPresent(i))
+		{
+			joystick.setID(i + 1);
+
+			if (glfwJoystickIsGamepad(i))
+			{
+				joystick.setGamepad();
+				joystick.resizeAxises(6);
+				joystick.resizeButtons(15);
+			}
+			else
+			{
+				int  axisCount;
+				auto axes = glfwGetJoystickAxes(i, &axisCount);
+				int  buttonCount;
+				auto buttons = glfwGetJoystickButtons(i, &buttonCount);
+
+				joystick.resizeAxises(static_cast<std::uint32_t>(axisCount));
+				joystick.resizeButtons(static_cast<std::uint32_t>(buttonCount));
+
+				for (std::uint32_t j = 0; j < static_cast<std::uint32_t>(axisCount); ++j)
+					joystick.setAxis(j, axes[j]);
+				for (std::uint32_t j = 0; j < static_cast<std::uint32_t>(buttonCount); ++j)
+				{
+					if (buttons[j])
+						joystick.buttonPressed(j);
+					else
+						joystick.buttonReleased(j);
+				}
+			}
+
+			Log::Debug("{} connected: {}, \"{}\"", joystick.isGamepad() ? "Gamepad" : "Joystick", joystick.getID(), glfwGetJoystickName(i));
+		}
+	}
+
+	Input::Inputs::Get().updateJGs(std::move(joysticks));
+
+	glfwSetJoystickCallback(&Carbonite::GLFWJoystickCallback);
+}
+
+void Carbonite::updateJoysticks()
+{
+	auto& inputs = Input::Inputs::Get();
+	for (std::uint32_t i = 0; i < 16; ++i)
+	{
+		auto joystick = inputs.getJoysticks()[i];
+
+		if (!joystick.isConnected())
+			continue;
+
+		if (joystick.isGamepad())
+		{
+			GLFWgamepadstate state;
+			if (!glfwGetGamepadState(i, &state))
+				continue;
+
+			for (std::uint32_t axis = 0; axis <= GLFW_GAMEPAD_AXIS_LAST; ++axis)
+				inputs.joystickAxis(i, i + 1, axis, state.axes[axis]);
+
+			for (std::uint32_t button = 0; button <= GLFW_GAMEPAD_BUTTON_LAST; ++button)
+			{
+				if (state.buttons[button])
+				{
+					if (!joystick.isButtonDown(button))
+						inputs.joystickButtonPressed(i, i + 1, button);
+				}
+				else if (joystick.isButtonDown(button))
+				{
+					inputs.joystickButtonReleased(i, i + 1, button);
+				}
+			}
+		}
+		else
+		{
+			int  axisCount;
+			auto axes = glfwGetJoystickAxes(i, &axisCount);
+			int  buttonCount;
+			auto buttons = glfwGetJoystickButtons(i, &buttonCount);
+
+			for (std::uint32_t axis = 0; axis < static_cast<std::uint32_t>(axisCount); ++axis)
+				inputs.joystickAxis(i, i + 1, axis, axes[axis]);
+			for (std::uint32_t button = 0; button < static_cast<std::uint32_t>(buttonCount); ++button)
+			{
+				if (buttons[button])
+				{
+					if (!joystick.isButtonDown(button))
+						inputs.joystickButtonPressed(i, i + 1, button);
+				}
+				else if (joystick.isButtonDown(button))
+				{
+					inputs.joystickButtonReleased(i, i + 1, button);
+				}
+			}
+		}
+	}
 }
 
 Carbonite::Carbonite()

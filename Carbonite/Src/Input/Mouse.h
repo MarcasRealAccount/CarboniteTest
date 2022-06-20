@@ -17,16 +17,16 @@ namespace Input
 		void buttonPressed(std::uint32_t button);
 		void buttonReleased(std::uint32_t button);
 
-		float getAxis(std::uint32_t axis);
+		float getAxis(std::uint32_t axis) const;
 
-		std::uint8_t getState(std::uint32_t button);
+		std::uint8_t getState(std::uint32_t button) const;
 
-		bool isButtonPressed(std::uint32_t button);
-		bool isButtonReleased(std::uint32_t button);
-		bool isButtonDown(std::uint32_t button);
+		bool isButtonPressed(std::uint32_t button) const;
+		bool isButtonReleased(std::uint32_t button) const;
+		bool isButtonDown(std::uint32_t button) const;
 
 	private:
-		float        m_Axises[4] { 0.0f };
+		float        m_Axes[4] { 0.0f };
 		std::uint8_t m_Buttons[s_MaxMouseButtons] { 0 };
 	};
 
@@ -45,11 +45,11 @@ namespace Input
 		static constexpr std::uint32_t MouseMiddle = Mouse3;
 	} // namespace Buttons
 
-	namespace Axises
+	namespace Axes
 	{
-		static constexpr std::uint32_t MouseX       = 0;
-		static constexpr std::uint32_t MouseY       = 1;
-		static constexpr std::uint32_t MouseScrollX = 2;
-		static constexpr std::uint32_t MouseScrollY = 3;
-	} // namespace Axises
+		static constexpr std::uint32_t MouseX      = 0;
+		static constexpr std::uint32_t MouseY      = 1;
+		static constexpr std::uint32_t MouseWheelX = 2;
+		static constexpr std::uint32_t MouseWheelY = 3;
+	} // namespace Axes
 } // namespace Input

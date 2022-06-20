@@ -11,10 +11,16 @@ public:
 	static Carbonite& Get();
 	static void       Destroy();
 
+private:
+	static void GLFWJoystickCallback(int jid, int event);
+
 public:
 	void init();
 	void run();
 	void deinit();
+
+	void initJoysticks();
+	void updateJoysticks();
 
 	auto getInstance() const { return m_Instance.get(); }
 	auto getSurface() const { return m_Surface.get(); }

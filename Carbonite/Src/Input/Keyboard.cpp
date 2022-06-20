@@ -21,7 +21,7 @@ namespace Input
 			m_Keys[key] |= ButtonStates::PressedMask | ButtonStates::DownMask;
 	}
 
-	void Keyboard::keyRepeat(std::uint32_t key)
+	void Keyboard::keyRepeated(std::uint32_t key)
 	{
 		if (key < s_MaxKeys)
 			m_Keys[key] |= ButtonStates::RepeatedMask | ButtonStates::DownMask;
@@ -33,27 +33,27 @@ namespace Input
 			m_Keys[key] |= ButtonStates::ReleasedMask;
 	}
 
-	std::uint8_t Keyboard::getState(std::uint32_t key)
+	std::uint8_t Keyboard::getState(std::uint32_t key) const
 	{
 		return key < s_MaxKeys ? m_Keys[key] : 0;
 	}
 
-	bool Keyboard::isKeyPressed(std::uint32_t key)
+	bool Keyboard::isKeyPressed(std::uint32_t key) const
 	{
 		return key < s_MaxKeys ? m_Keys[key] & ButtonStates::PressedMask : false;
 	}
 
-	bool Keyboard::isKeyRepeated(std::uint32_t key)
+	bool Keyboard::isKeyRepeated(std::uint32_t key) const
 	{
 		return key < s_MaxKeys ? m_Keys[key] & ButtonStates::RepeatedMask : false;
 	}
 
-	bool Keyboard::isKeyReleased(std::uint32_t key)
+	bool Keyboard::isKeyReleased(std::uint32_t key) const
 	{
 		return key < s_MaxKeys ? m_Keys[key] & ButtonStates::ReleasedMask : false;
 	}
 
-	bool Keyboard::isKeyDown(std::uint32_t key)
+	bool Keyboard::isKeyDown(std::uint32_t key) const
 	{
 		return key < s_MaxKeys ? m_Keys[key] & ButtonStates::DownMask : false;
 	}

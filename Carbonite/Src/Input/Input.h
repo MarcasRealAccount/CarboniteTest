@@ -1,11 +1,13 @@
 #pragma once
 
 #include "ButtonStates.h"
+#include "Joystick.h"
 #include "Keyboard.h"
 #include "Mouse.h"
 
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 #include <glm/glm.hpp>
 
@@ -33,7 +35,7 @@ namespace Input
 
 	public:
 		EInputLocation m_Location;
-		std::uint64_t  m_UUID;
+		std::uint32_t  m_ID;
 		std::uint32_t  m_Index;
 	};
 
@@ -201,6 +203,8 @@ namespace Input
 		static void    Destroy();
 
 	public:
+		void updateJGs(std::vector<Joystick>&& joysticks);
+
 		void updateGrouped();
 		void postUpdateGrouped();
 
@@ -214,6 +218,13 @@ namespace Input
 		void mouseButtonPressed(std::uint32_t button);
 		void mouseButtonReleased(std::uint32_t button);
 
+		void joystickConnect(std::uint32_t index, std::uint32_t id, std::uint32_t axes, std::uint32_t buttons, bool gamepad);
+		void joystickDisconnect(std::uint32_t index);
+		void joystickAxis(std::uint32_t index, std::uint32_t id, std::uint32_t axis, float value);
+		void joystickButtonPressed(std::uint32_t index, std::uint32_t id, std::uint32_t button);
+		void joystickButtonRepeated(std::uint32_t index, std::uint32_t id, std::uint32_t button);
+		void joystickButtonReleased(std::uint32_t index, std::uint32_t id, std::uint32_t button);
+
 		InputGroup* getGroup(const std::string& name);
 		InputGroup* createGroup(const std::string& name);
 		InputGroup* getOrCreateGroup(const std::string& name);
@@ -226,6 +237,12 @@ namespace Input
 		float        getAxisState(Binding binding);
 		std::uint8_t getButtonState(Binding binding);
 
+		auto&           getKeyboard() const { return m_Keyboard; }
+		auto&           getMouse() const { return m_Keyboard; }
+		auto&           getJoysticks() const { return m_Joysticks; }
+		Joystick*       getJoystick(std::uint32_t id);
+		const Joystick* getJoystick(std::uint32_t id) const;
+
 	private:
 		Inputs();
 		~Inputs() = default;
@@ -236,6 +253,8 @@ namespace Input
 	private:
 		Keyboard m_Keyboard;
 		Mouse    m_Mouse;
+
+		std::vector<Joystick> m_Joysticks;
 
 		std::unordered_map<std::string, InputGroup> m_Groups;
 	};
@@ -249,14 +268,14 @@ namespace Input
 	inline void ToggleGroup(const std::string& name) { Inputs::Get().toggleGroup(name); }
 	inline bool IsGroupEnabled(const std::string& name) { return Inputs::Get().isGroupEnabled(name); }
 
-	inline void RegisterButtonBinding(const std::string& name, std::uint32_t button, EInputLocation location = EInputLocation::Keyboard, std::uint64_t uuid = 0)
+	inline void RegisterButtonBinding(const std::string& name, std::uint32_t button, EInputLocation location = EInputLocation::Keyboard, std::uint32_t id = 0)
 	{
-		Inputs::Get().registerButtonBinding(name, ButtonBinding { name, Binding { location, uuid, button } });
+		Inputs::Get().registerButtonBinding(name, ButtonBinding { name, Binding { location, id, button } });
 	}
 
-	inline void RegisterAxisBinding(const std::string& name, std::uint32_t axis, EAxisMode mode = EAxisMode::Direct, EInputLocation location = EInputLocation::Mouse, std::uint64_t uuid = 0)
+	inline void RegisterAxisBinding(const std::string& name, std::uint32_t axis, EAxisMode mode = EAxisMode::Direct, EInputLocation location = EInputLocation::Mouse, std::uint32_t id = 0)
 	{
-		Inputs::Get().registerAxisBinding(name, AxisBinding { name, Binding { location, uuid, axis }, mode });
+		Inputs::Get().registerAxisBinding(name, AxisBinding { name, Binding { location, id, axis }, mode });
 	}
 
 	inline void RegisterAxis2DBinding(const std::string& name, Binding xAxis, Binding yAxis, EAxisMode mode = EAxisMode::Direct)
@@ -293,20 +312,20 @@ namespace Input
 	inline glm::fvec2   Axis2D(const std::string& name) { return Inputs::Get().getAxis2D(name); }
 	inline glm::fvec3   Axis3D(const std::string& name) { return Inputs::Get().getAxis3D(name); }
 
-	inline void RegisterButtonBinding(const std::string& group, const std::string& name, std::uint32_t button, EInputLocation location = EInputLocation::Keyboard, std::uint64_t uuid = 0)
+	inline void RegisterButtonBinding(const std::string& group, const std::string& name, std::uint32_t button, EInputLocation location = EInputLocation::Keyboard, std::uint32_t id = 0)
 	{
 		auto g = GetOrCreateGroup(group);
 		if (!g)
 			return;
-		g->registerButtonBinding(name, ButtonBinding { name, Binding { location, uuid, button } });
+		g->registerButtonBinding(name, ButtonBinding { name, Binding { location, id, button } });
 	}
 
-	inline void RegisterAxisBinding(const std::string& group, const std::string& name, std::uint32_t axis, EAxisMode mode = EAxisMode::Direct, EInputLocation location = EInputLocation::Mouse, std::uint64_t uuid = 0)
+	inline void RegisterAxisBinding(const std::string& group, const std::string& name, std::uint32_t axis, EAxisMode mode = EAxisMode::Direct, EInputLocation location = EInputLocation::Mouse, std::uint32_t id = 0)
 	{
 		auto g = GetOrCreateGroup(group);
 		if (!g)
 			return;
-		g->registerAxisBinding(name, AxisBinding { name, Binding { location, uuid, axis }, mode });
+		g->registerAxisBinding(name, AxisBinding { name, Binding { location, id, axis }, mode });
 	}
 
 	inline void RegisterAxis2DBinding(const std::string& group, const std::string& name, Binding xAxis, Binding yAxis, EAxisMode mode = EAxisMode::Direct)

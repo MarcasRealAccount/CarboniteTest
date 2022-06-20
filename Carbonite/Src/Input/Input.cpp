@@ -4,7 +4,7 @@ namespace Input
 {
 	bool operator==(Binding lhs, Binding rhs)
 	{
-		return lhs.m_Location == rhs.m_Location && lhs.m_UUID == rhs.m_UUID && lhs.m_Index == rhs.m_Index;
+		return lhs.m_Location == rhs.m_Location && (lhs.m_ID == 0 ? true : lhs.m_ID == rhs.m_ID) && lhs.m_Index == rhs.m_Index;
 	}
 
 	InputGroup::InputGroup(Inputs* inputs, const std::string& name)
@@ -406,6 +406,11 @@ namespace Input
 		delete &Get();
 	}
 
+	void Inputs::updateJGs(std::vector<Joystick>&& joysticks)
+	{
+		m_Joysticks = std::move(joysticks);
+	}
+
 	void Inputs::updateGrouped()
 	{
 		update();
@@ -431,7 +436,7 @@ namespace Input
 
 	void Inputs::keyRepeat(std::uint32_t key)
 	{
-		m_Keyboard.keyRepeat(key);
+		m_Keyboard.keyRepeated(key);
 		setButtonGrouped(Binding { EInputLocation::Keyboard, 0, key }, m_Keyboard.getState(key));
 	}
 
@@ -443,18 +448,18 @@ namespace Input
 
 	void Inputs::mouseMove(float x, float y)
 	{
-		m_Mouse.setAxis(Axises::MouseX, x);
-		m_Mouse.setAxis(Axises::MouseY, y);
-		setAxisGrouped(Binding { EInputLocation::Mouse, 0, Axises::MouseX }, x);
-		setAxisGrouped(Binding { EInputLocation::Mouse, 0, Axises::MouseY }, y);
+		m_Mouse.setAxis(Axes::MouseX, x);
+		m_Mouse.setAxis(Axes::MouseY, y);
+		setAxisGrouped(Binding { EInputLocation::Mouse, 0, Axes::MouseX }, x);
+		setAxisGrouped(Binding { EInputLocation::Mouse, 0, Axes::MouseY }, y);
 	}
 
 	void Inputs::mouseScroll(float x, float y)
 	{
-		m_Mouse.setAxis(Axises::MouseScrollX, x);
-		m_Mouse.setAxis(Axises::MouseScrollY, y);
-		setAxisGrouped(Binding { EInputLocation::Mouse, 0, Axises::MouseScrollX }, x);
-		setAxisGrouped(Binding { EInputLocation::Mouse, 0, Axises::MouseScrollY }, y);
+		m_Mouse.setAxis(Axes::MouseWheelX, x);
+		m_Mouse.setAxis(Axes::MouseWheelY, y);
+		setAxisGrouped(Binding { EInputLocation::Mouse, 0, Axes::MouseWheelX }, x);
+		setAxisGrouped(Binding { EInputLocation::Mouse, 0, Axes::MouseWheelY }, y);
 	}
 
 	void Inputs::mouseButtonPressed(std::uint32_t button)
@@ -467,6 +472,68 @@ namespace Input
 	{
 		m_Mouse.buttonReleased(button);
 		setButtonGrouped({ EInputLocation::Mouse, 0, button }, m_Mouse.getState(button));
+	}
+
+	void Inputs::joystickConnect(std::uint32_t index, std::uint32_t id, std::uint32_t axes, std::uint32_t buttons, bool gamepad)
+	{
+		if (index >= m_Joysticks.size())
+			return;
+
+		auto& joystick = m_Joysticks[index];
+		joystick.setID(id);
+		if (gamepad)
+			joystick.setGamepad();
+		joystick.resizeAxises(axes);
+		joystick.resizeButtons(buttons);
+	}
+
+	void Inputs::joystickDisconnect(std::uint32_t index)
+	{
+		if (index >= m_Joysticks.size())
+			return;
+
+		auto& joystick = m_Joysticks[index];
+		joystick.setID(0);
+	}
+
+	void Inputs::joystickAxis(std::uint32_t index, std::uint32_t id, std::uint32_t axis, float value)
+	{
+		if (index >= m_Joysticks.size())
+			return;
+
+		auto& joystick = m_Joysticks[index];
+		joystick.setAxis(axis, value);
+		setAxisGrouped(Binding { joystick.isGamepad() ? EInputLocation::Gamepad : EInputLocation::Joystick, id, axis }, value);
+	}
+
+	void Inputs::joystickButtonPressed(std::uint32_t index, std::uint32_t id, std::uint32_t button)
+	{
+		if (index >= m_Joysticks.size())
+			return;
+
+		auto& joystick = m_Joysticks[index];
+		joystick.buttonPressed(button);
+		setButtonGrouped(Binding { joystick.isGamepad() ? EInputLocation::Gamepad : EInputLocation::Joystick, id, button }, joystick.getState(button));
+	}
+
+	void Inputs::joystickButtonRepeated(std::uint32_t index, std::uint32_t id, std::uint32_t button)
+	{
+		if (index >= m_Joysticks.size())
+			return;
+
+		auto& joystick = m_Joysticks[index];
+		joystick.buttonRepeated(button);
+		setButtonGrouped(Binding { joystick.isGamepad() ? EInputLocation::Gamepad : EInputLocation::Joystick, id, button }, joystick.getState(button));
+	}
+
+	void Inputs::joystickButtonReleased(std::uint32_t index, std::uint32_t id, std::uint32_t button)
+	{
+		if (index >= m_Joysticks.size())
+			return;
+
+		auto& joystick = m_Joysticks[index];
+		joystick.buttonReleased(button);
+		setButtonGrouped(Binding { joystick.isGamepad() ? EInputLocation::Gamepad : EInputLocation::Joystick, id, button }, joystick.getState(button));
 	}
 
 	InputGroup* Inputs::getGroup(const std::string& name)
@@ -519,8 +586,8 @@ namespace Input
 		switch (binding.m_Location)
 		{
 		case EInputLocation::Mouse: return m_Mouse.getAxis(binding.m_Index);
-		case EInputLocation::Gamepad: return 0.0f; // TODO(MarcasRealAccount): Add support
-		case EInputLocation::Joystick: return 0.0f;
+		case EInputLocation::Gamepad: [[fallthrough]];
+		case EInputLocation::Joystick: return getJoystick(binding.m_ID)->getAxis(binding.m_Index);
 		default: return 0.0f;
 		}
 	}
@@ -531,10 +598,26 @@ namespace Input
 		{
 		case EInputLocation::Keyboard: return m_Keyboard.getState(binding.m_Index);
 		case EInputLocation::Mouse: return m_Mouse.getState(binding.m_Index);
-		case EInputLocation::Gamepad: return 0; // TODO(MarcasRealAccount): Add support
-		case EInputLocation::Joystick: return 0;
+		case EInputLocation::Gamepad: [[fallthrough]];
+		case EInputLocation::Joystick: return getJoystick(binding.m_ID)->getState(binding.m_Index);
 		default: return 0;
 		}
+	}
+
+	Joystick* Inputs::getJoystick(std::uint32_t id)
+	{
+		for (auto& joystick : m_Joysticks)
+			if (joystick.getID() == id)
+				return &joystick;
+		return nullptr;
+	}
+
+	const Joystick* Inputs::getJoystick(std::uint32_t id) const
+	{
+		for (auto& joystick : m_Joysticks)
+			if (joystick.getID() == id)
+				return &joystick;
+		return nullptr;
 	}
 
 	Inputs::Inputs()

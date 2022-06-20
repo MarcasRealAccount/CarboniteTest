@@ -2,7 +2,7 @@
 
 namespace Input
 {
-	static constexpr std::size_t s_MaxKeys = 348;
+	static constexpr std::size_t s_MaxKeys = 512;
 
 	class Keyboard final
 	{
@@ -13,15 +13,15 @@ namespace Input
 		void update();
 
 		void keyPressed(std::uint32_t key);
-		void keyRepeat(std::uint32_t key);
+		void keyRepeated(std::uint32_t key);
 		void keyReleased(std::uint32_t key);
 
-		std::uint8_t getState(std::uint32_t key);
+		std::uint8_t getState(std::uint32_t key) const;
 
-		bool isKeyPressed(std::uint32_t key);
-		bool isKeyRepeated(std::uint32_t key);
-		bool isKeyReleased(std::uint32_t key);
-		bool isKeyDown(std::uint32_t key);
+		bool isKeyPressed(std::uint32_t key) const;
+		bool isKeyRepeated(std::uint32_t key) const;
+		bool isKeyReleased(std::uint32_t key) const;
+		bool isKeyDown(std::uint32_t key) const;
 
 	private:
 		std::uint8_t m_Keys[s_MaxKeys] { 0 };
