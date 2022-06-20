@@ -72,6 +72,9 @@ public:
 	const GLFWvidmode* getBestVideoMode(GLFWmonitor* monitor) const;
 
 	auto& getData() const { return m_Data; }
+	bool  isIconified() const { return m_Data.m_State == EWindowState::Iconified; }
+	bool  isMaximized() const { return m_Data.m_State == EWindowState::Maximized; }
+	bool  isFullscreen() const { return m_Data.m_State == EWindowState::Fullscreen; }
 	auto& getTitle() const { return m_Title; }
 	auto  getNative() const { return m_Native; }
 	auto  getSurface() const { return m_Surface; }

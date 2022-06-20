@@ -40,6 +40,8 @@ void Window::PosCallback(GLFWwindow* window, int x, int y)
 
 	wnd->m_Data.m_X = x;
 	wnd->m_Data.m_Y = y;
+
+	Log::Debug("Window pos changed {}, {}", x, y);
 }
 
 void Window::SizeCallback(GLFWwindow* window, int width, int height)
@@ -189,6 +191,9 @@ void Window::restore()
 			case EWindowState::Maximized:
 				glfwMaximizeWindow(m_Native);
 				break;
+			default:
+				m_Data.m_State = m_PData.m_State;
+				break;
 			}
 		}
 		else
@@ -237,10 +242,8 @@ void Window::fullscreen()
 		m_PData = m_Data;
 		glfwSetWindowMonitor(m_Native, monitor, 0, 0, vidmode->width, vidmode->height, vidmode->refreshRate);
 	}
-	else
-	{
-		m_Data.m_State = EWindowState::Fullscreen;
-	}
+
+	m_Data.m_State = EWindowState::Fullscreen;
 }
 
 bool Window::create()
@@ -253,9 +256,16 @@ bool Window::create()
 		throw std::runtime_error("Window::create() expected surface to be created first!");
 	m_Surface->setWindowHints();
 
+	GLFWmonitor* monitor = getBestMonitor();
+
+	int mx = 0, my = 0, mw = 0, mh = 0;
+	glfwGetMonitorWorkarea(monitor, &mx, &my, &mw, &mh);
+
+	m_Data.m_X = m_Data.m_X == 1 << 31 ? mx + (mw - m_Data.m_Width) / 2 : m_Data.m_X;
+	m_Data.m_Y = m_Data.m_Y == 1 << 31 ? my + (mh - m_Data.m_Height) / 2 : m_Data.m_Y;
+
 	if (m_Data.m_State == EWindowState::Fullscreen)
 	{
-		GLFWmonitor*       monitor = getBestMonitor();
 		const GLFWvidmode* vidmode = getBestVideoMode(monitor);
 
 		glfwWindowHint(GLFW_RED_BITS, vidmode->redBits);
@@ -275,20 +285,10 @@ bool Window::create()
 	if (!m_Native)
 		return false;
 
+	glfwSetWindowPos(m_Native, m_Data.m_X, m_Data.m_Y);
+
 	switch (m_Data.m_State)
 	{
-	case EWindowState::Normal:
-	{
-		GLFWmonitor* monitor = getBestMonitor();
-
-		int mx = 0, my = 0, mw = 0, mh = 0;
-		glfwGetMonitorWorkarea(monitor, &mx, &my, &mw, &mh);
-
-		std::int32_t x = m_Data.m_X == 1 << 31 ? mx + (mw - m_Data.m_Width) / 2 : m_Data.m_X;
-		std::int32_t y = m_Data.m_Y == 1 << 31 ? my + (mh - m_Data.m_Height) / 2 : m_Data.m_Y;
-		glfwSetWindowPos(m_Native, x, y);
-		break;
-	}
 	case EWindowState::Iconified:
 		glfwIconifyWindow(m_Native);
 		break;
@@ -358,10 +358,12 @@ GLFWmonitor* Window::getBestMonitor() const
 		GLFWmonitor* monitor = monitors[i];
 		glfwGetMonitorWorkarea(monitor, &mx, &my, &mw, &mh);
 
-		std::uint64_t ax   = std::min<std::uint64_t>(wx, mx);
-		std::uint64_t ay   = std::min<std::uint64_t>(wy, my);
-		std::uint64_t bx   = std::min<std::uint64_t>(static_cast<std::uint64_t>(wx) + ww, static_cast<std::uint64_t>(mx) + mw);
-		std::uint64_t by   = std::min<std::uint64_t>(static_cast<std::uint64_t>(wy) + wh, static_cast<std::uint64_t>(my) + mh);
+		std::uint64_t ax = std::max<std::uint64_t>(wx, mx);
+		std::uint64_t ay = std::max<std::uint64_t>(wy, my);
+		std::uint64_t bx = std::min<std::uint64_t>(static_cast<std::uint64_t>(wx) + ww, static_cast<std::uint64_t>(mx) + mw);
+		std::uint64_t by = std::min<std::uint64_t>(static_cast<std::uint64_t>(wy) + wh, static_cast<std::uint64_t>(my) + mh);
+		if (bx < ax || by < ay)
+			continue;
 		std::uint64_t area = (bx - ax) * (by - ay);
 		if (area > bestArea)
 		{

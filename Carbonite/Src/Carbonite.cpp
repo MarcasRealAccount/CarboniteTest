@@ -66,6 +66,7 @@ void Carbonite::init()
 
 	m_Device = m_Instance->createDevice(m_Surface.get());
 
+	Input::RegisterButtonBinding("toggleFullscreen", Input::Buttons::KeyF11);
 	Input::RegisterButtonBinding("close", Input::Buttons::KeyEscape);
 	Input::RegisterButtonBinding("toggleMenu", Input::Buttons::KeyI);
 	Input::RegisterButtonAxis3DBinding("onFoot",
@@ -99,8 +100,14 @@ void Carbonite::run()
 			Input::ToggleGroup("onFoot");
 		}
 
-		Log::Debug("Movement {}", Input::Axis3D("onFoot", "movement"));
-		Log::Debug("Turn     {}", Input::Axis2D("onFoot", "turn"));
+		if (Input::ButtonPressed("toggleFullscreen"))
+		{
+			Log::Trace("ToggledFullscreen");
+			if (m_Window.isFullscreen())
+				m_Window.restore();
+			else
+				m_Window.fullscreen();
+		}
 
 		m_Device->beginRendering();
 
