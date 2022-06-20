@@ -40,8 +40,6 @@ void Window::PosCallback(GLFWwindow* window, int x, int y)
 
 	wnd->m_Data.m_X = x;
 	wnd->m_Data.m_Y = y;
-
-	Log::Debug("Window pos changed {}, {}", x, y);
 }
 
 void Window::SizeCallback(GLFWwindow* window, int width, int height)
