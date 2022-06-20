@@ -37,6 +37,7 @@ namespace Input
 		EInputLocation m_Location;
 		std::uint32_t  m_ID;
 		std::uint32_t  m_Index;
+		float          m_Sensitivity = 1.0f;
 	};
 
 	struct ButtonBinding
@@ -273,9 +274,9 @@ namespace Input
 		Inputs::Get().registerButtonBinding(name, ButtonBinding { name, Binding { location, id, button } });
 	}
 
-	inline void RegisterAxisBinding(const std::string& name, std::uint32_t axis, EAxisMode mode = EAxisMode::Direct, EInputLocation location = EInputLocation::Mouse, std::uint32_t id = 0)
+	inline void RegisterAxisBinding(const std::string& name, std::uint32_t axis, float sensitivity = 1.0f, EAxisMode mode = EAxisMode::Direct, EInputLocation location = EInputLocation::Mouse, std::uint32_t id = 0)
 	{
-		Inputs::Get().registerAxisBinding(name, AxisBinding { name, Binding { location, id, axis }, mode });
+		Inputs::Get().registerAxisBinding(name, AxisBinding { name, Binding { location, id, axis, sensitivity }, mode });
 	}
 
 	inline void RegisterAxis2DBinding(const std::string& name, Binding xAxis, Binding yAxis, EAxisMode mode = EAxisMode::Direct)
@@ -320,12 +321,12 @@ namespace Input
 		g->registerButtonBinding(name, ButtonBinding { name, Binding { location, id, button } });
 	}
 
-	inline void RegisterAxisBinding(const std::string& group, const std::string& name, std::uint32_t axis, EAxisMode mode = EAxisMode::Direct, EInputLocation location = EInputLocation::Mouse, std::uint32_t id = 0)
+	inline void RegisterAxisBinding(const std::string& group, const std::string& name, std::uint32_t axis, float sensitivity = 1.0f, EAxisMode mode = EAxisMode::Direct, EInputLocation location = EInputLocation::Mouse, std::uint32_t id = 0)
 	{
 		auto g = GetOrCreateGroup(group);
 		if (!g)
 			return;
-		g->registerAxisBinding(name, AxisBinding { name, Binding { location, id, axis }, mode });
+		g->registerAxisBinding(name, AxisBinding { name, Binding { location, id, axis, sensitivity }, mode });
 	}
 
 	inline void RegisterAxis2DBinding(const std::string& group, const std::string& name, Binding xAxis, Binding yAxis, EAxisMode mode = EAxisMode::Direct)

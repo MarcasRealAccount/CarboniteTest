@@ -45,26 +45,26 @@ namespace Input
 			for (auto& binding : m_ButtonAxisBindings)
 			{
 				binding.m_State = 0.0f;
-				binding.m_State += m_Inputs->getButtonState(binding.m_PosButton) & ButtonStates::DownMask ? 1.0f : 0.0f;
-				binding.m_State -= m_Inputs->getButtonState(binding.m_NegButton) & ButtonStates::DownMask ? 1.0f : 0.0f;
+				binding.m_State += m_Inputs->getButtonState(binding.m_PosButton) & ButtonStates::DownMask ? binding.m_PosButton.m_Sensitivity : 0.0f;
+				binding.m_State -= m_Inputs->getButtonState(binding.m_NegButton) & ButtonStates::DownMask ? binding.m_NegButton.m_Sensitivity : 0.0f;
 			}
 			for (auto& binding : m_ButtonAxis2DBindings)
 			{
 				binding.m_State = { 0.0f, 0.0f };
-				binding.m_State.x += m_Inputs->getButtonState(binding.m_PosXButton) & ButtonStates::DownMask ? 1.0f : 0.0f;
-				binding.m_State.x -= m_Inputs->getButtonState(binding.m_NegXButton) & ButtonStates::DownMask ? 1.0f : 0.0f;
-				binding.m_State.y += m_Inputs->getButtonState(binding.m_PosYButton) & ButtonStates::DownMask ? 1.0f : 0.0f;
-				binding.m_State.y -= m_Inputs->getButtonState(binding.m_NegYButton) & ButtonStates::DownMask ? 1.0f : 0.0f;
+				binding.m_State.x += m_Inputs->getButtonState(binding.m_PosXButton) & ButtonStates::DownMask ? binding.m_PosXButton.m_Sensitivity : 0.0f;
+				binding.m_State.x -= m_Inputs->getButtonState(binding.m_NegXButton) & ButtonStates::DownMask ? binding.m_NegXButton.m_Sensitivity : 0.0f;
+				binding.m_State.y += m_Inputs->getButtonState(binding.m_PosYButton) & ButtonStates::DownMask ? binding.m_PosYButton.m_Sensitivity : 0.0f;
+				binding.m_State.y -= m_Inputs->getButtonState(binding.m_NegYButton) & ButtonStates::DownMask ? binding.m_NegYButton.m_Sensitivity : 0.0f;
 			}
 			for (auto& binding : m_ButtonAxis3DBindings)
 			{
 				binding.m_State = { 0.0f, 0.0f, 0.0f };
-				binding.m_State.x += m_Inputs->getButtonState(binding.m_PosXButton) & ButtonStates::DownMask ? 1.0f : 0.0f;
-				binding.m_State.x -= m_Inputs->getButtonState(binding.m_NegXButton) & ButtonStates::DownMask ? 1.0f : 0.0f;
-				binding.m_State.y += m_Inputs->getButtonState(binding.m_PosYButton) & ButtonStates::DownMask ? 1.0f : 0.0f;
-				binding.m_State.y -= m_Inputs->getButtonState(binding.m_NegYButton) & ButtonStates::DownMask ? 1.0f : 0.0f;
-				binding.m_State.z += m_Inputs->getButtonState(binding.m_PosZButton) & ButtonStates::DownMask ? 1.0f : 0.0f;
-				binding.m_State.z -= m_Inputs->getButtonState(binding.m_NegZButton) & ButtonStates::DownMask ? 1.0f : 0.0f;
+				binding.m_State.x += m_Inputs->getButtonState(binding.m_PosXButton) & ButtonStates::DownMask ? binding.m_PosXButton.m_Sensitivity : 0.0f;
+				binding.m_State.x -= m_Inputs->getButtonState(binding.m_NegXButton) & ButtonStates::DownMask ? binding.m_NegXButton.m_Sensitivity : 0.0f;
+				binding.m_State.y += m_Inputs->getButtonState(binding.m_PosYButton) & ButtonStates::DownMask ? binding.m_PosYButton.m_Sensitivity : 0.0f;
+				binding.m_State.y -= m_Inputs->getButtonState(binding.m_NegYButton) & ButtonStates::DownMask ? binding.m_NegYButton.m_Sensitivity : 0.0f;
+				binding.m_State.z += m_Inputs->getButtonState(binding.m_PosZButton) & ButtonStates::DownMask ? binding.m_PosZButton.m_Sensitivity : 0.0f;
+				binding.m_State.z -= m_Inputs->getButtonState(binding.m_NegZButton) & ButtonStates::DownMask ? binding.m_NegZButton.m_Sensitivity : 0.0f;
 			}
 		}
 		else
@@ -235,7 +235,7 @@ namespace Input
 			switch (binding->m_Mode)
 			{
 			case EAxisMode::Direct: return binding->m_State;
-			case EAxisMode::Relative: return binding->m_State - binding->m_PState;
+			case EAxisMode::Relative: return (binding->m_State - binding->m_PState) * binding->m_Axis.m_Sensitivity;
 			default: return 0.0f;
 			}
 		}
@@ -269,7 +269,7 @@ namespace Input
 			switch (binding->m_Mode)
 			{
 			case EAxisMode::Direct: return binding->m_State;
-			case EAxisMode::Relative: return binding->m_State - binding->m_PState;
+			case EAxisMode::Relative: return (binding->m_State - binding->m_PState) * glm::fvec2 { binding->m_XAxis.m_Sensitivity, binding->m_YAxis.m_Sensitivity };
 			default: return { 0.0f, 0.0f };
 			}
 		}
@@ -303,7 +303,7 @@ namespace Input
 			switch (binding->m_Mode)
 			{
 			case EAxisMode::Direct: return binding->m_State;
-			case EAxisMode::Relative: return binding->m_State - binding->m_PState;
+			case EAxisMode::Relative: return (binding->m_State - binding->m_PState) * glm::fvec3 { binding->m_XAxis.m_Sensitivity, binding->m_YAxis.m_Sensitivity, binding->m_ZAxis.m_Sensitivity };
 			default: return { 0.0f, 0.0f, 0.0f };
 			}
 		}
@@ -325,25 +325,25 @@ namespace Input
 		for (auto& bnd : m_AxisBindings)
 		{
 			if (bnd.m_Axis == binding)
-				bnd.m_State = value;
+				bnd.m_State = bnd.m_Mode == EAxisMode::Direct ? value * bnd.m_Axis.m_Sensitivity : value;
 		}
 
 		for (auto& bnd : m_Axis2DBindings)
 		{
 			if (bnd.m_XAxis == binding)
-				bnd.m_State.x = value;
+				bnd.m_State.x = bnd.m_Mode == EAxisMode::Direct ? value * bnd.m_XAxis.m_Sensitivity : value;
 			if (bnd.m_YAxis == binding)
-				bnd.m_State.y = value;
+				bnd.m_State.y = bnd.m_Mode == EAxisMode::Direct ? value * bnd.m_YAxis.m_Sensitivity : value;
 		}
 
 		for (auto& bnd : m_Axis3DBindings)
 		{
 			if (bnd.m_XAxis == binding)
-				bnd.m_State.x = value;
+				bnd.m_State.x = bnd.m_Mode == EAxisMode::Direct ? value * bnd.m_XAxis.m_Sensitivity : value;
 			if (bnd.m_YAxis == binding)
-				bnd.m_State.y = value;
+				bnd.m_State.y = bnd.m_Mode == EAxisMode::Direct ? value * bnd.m_YAxis.m_Sensitivity : value;
 			if (bnd.m_ZAxis == binding)
-				bnd.m_State.z = value;
+				bnd.m_State.z = bnd.m_Mode == EAxisMode::Direct ? value * bnd.m_ZAxis.m_Sensitivity : value;
 		}
 	}
 
@@ -360,37 +360,37 @@ namespace Input
 			for (auto& bnd : m_ButtonAxisBindings)
 			{
 				if (bnd.m_PosButton == binding)
-					bnd.m_State += 1.0f;
+					bnd.m_State += bnd.m_PosButton.m_Sensitivity;
 				if (bnd.m_NegButton == binding)
-					bnd.m_State -= 1.0f;
+					bnd.m_State -= bnd.m_NegButton.m_Sensitivity;
 			}
 
 			for (auto& bnd : m_ButtonAxis2DBindings)
 			{
 				if (bnd.m_PosXButton == binding)
-					bnd.m_State.x += 1.0f;
+					bnd.m_State.x += bnd.m_PosXButton.m_Sensitivity;
 				if (bnd.m_NegXButton == binding)
-					bnd.m_State.x -= 1.0f;
+					bnd.m_State.x -= bnd.m_NegXButton.m_Sensitivity;
 				if (bnd.m_PosYButton == binding)
-					bnd.m_State.y += 1.0f;
+					bnd.m_State.y += bnd.m_PosYButton.m_Sensitivity;
 				if (bnd.m_NegYButton == binding)
-					bnd.m_State.y -= 1.0f;
+					bnd.m_State.y -= bnd.m_NegYButton.m_Sensitivity;
 			}
 
 			for (auto& bnd : m_ButtonAxis3DBindings)
 			{
 				if (bnd.m_PosXButton == binding)
-					bnd.m_State.x += 1.0f;
+					bnd.m_State.x += bnd.m_PosXButton.m_Sensitivity;
 				if (bnd.m_NegXButton == binding)
-					bnd.m_State.x -= 1.0f;
+					bnd.m_State.x -= bnd.m_NegXButton.m_Sensitivity;
 				if (bnd.m_PosYButton == binding)
-					bnd.m_State.y += 1.0f;
+					bnd.m_State.y += bnd.m_PosYButton.m_Sensitivity;
 				if (bnd.m_NegYButton == binding)
-					bnd.m_State.y -= 1.0f;
+					bnd.m_State.y -= bnd.m_NegYButton.m_Sensitivity;
 				if (bnd.m_PosZButton == binding)
-					bnd.m_State.z += 1.0f;
+					bnd.m_State.z += bnd.m_PosZButton.m_Sensitivity;
 				if (bnd.m_NegZButton == binding)
-					bnd.m_State.z -= 1.0f;
+					bnd.m_State.z -= bnd.m_NegZButton.m_Sensitivity;
 			}
 		}
 	}
