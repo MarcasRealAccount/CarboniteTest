@@ -1,31 +1,37 @@
 #pragma once
 
+#include <cstdint>
+
 namespace Input
 {
-	static constexpr std::size_t s_MaxKeys = 512;
-
-	class Keyboard final
+	namespace Devices
 	{
-	public:
-		Keyboard()  = default;
-		~Keyboard() = default;
+		class Keyboard final
+		{
+		public:
+			static constexpr std::size_t c_MaxKeys = 512;
 
-		void update();
+		public:
+			Keyboard()  = default;
+			~Keyboard() = default;
 
-		void keyPressed(std::uint32_t key);
-		void keyRepeated(std::uint32_t key);
-		void keyReleased(std::uint32_t key);
+			void update();
 
-		std::uint8_t getState(std::uint32_t key) const;
+			void keyPressed(std::uint32_t key);
+			void keyRepeated(std::uint32_t key);
+			void keyReleased(std::uint32_t key);
 
-		bool isKeyPressed(std::uint32_t key) const;
-		bool isKeyRepeated(std::uint32_t key) const;
-		bool isKeyReleased(std::uint32_t key) const;
-		bool isKeyDown(std::uint32_t key) const;
+			std::uint8_t getState(std::uint32_t key) const;
 
-	private:
-		std::uint8_t m_Keys[s_MaxKeys] { 0 };
-	};
+			bool isKeyPressed(std::uint32_t key) const;
+			bool isKeyRepeated(std::uint32_t key) const;
+			bool isKeyReleased(std::uint32_t key) const;
+			bool isKeyDown(std::uint32_t key) const;
+
+		private:
+			std::uint8_t m_Keys[c_MaxKeys] { 0 };
+		};
+	} // namespace Devices
 
 	namespace Buttons
 	{

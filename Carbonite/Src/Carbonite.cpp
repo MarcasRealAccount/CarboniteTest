@@ -88,9 +88,9 @@ void Carbonite::run()
 {
 	Log::Trace("Run");
 
-	Input::Inputs::Get().updateGrouped();
+	Input::Inputs::Get().update();
 	glfwPollEvents();
-	Input::Inputs::Get().postUpdateGrouped();
+	Input::Inputs::Get().postUpdate();
 
 	while (!m_Window.shouldClose())
 	{
@@ -113,10 +113,10 @@ void Carbonite::run()
 
 		m_Device->endRendering();
 
-		Input::Inputs::Get().updateGrouped();
+		Input::Inputs::Get().update();
 		glfwPollEvents();
 		updateJoysticks();
-		Input::Inputs::Get().postUpdateGrouped();
+		Input::Inputs::Get().postUpdate();
 
 		if (Input::Button("close"))
 			m_Window.requestClose();
@@ -137,7 +137,7 @@ void Carbonite::initJoysticks()
 {
 	Log::Trace("Init Joysticks");
 
-	std::vector<Input::Joystick> joysticks;
+	std::vector<Input::Devices::Joystick> joysticks;
 	joysticks.reserve(16);
 
 	for (std::uint32_t i = 0; i < 16; ++i)
@@ -178,7 +178,7 @@ void Carbonite::initJoysticks()
 		}
 	}
 
-	Input::Inputs::Get().updateJGs(std::move(joysticks));
+	Input::Inputs::Get().updateJoysticks(std::move(joysticks));
 
 	glfwSetJoystickCallback(&Carbonite::GLFWJoystickCallback);
 }

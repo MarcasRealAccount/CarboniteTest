@@ -1,17 +1,17 @@
 #include "Mouse.h"
-#include "ButtonStates.h"
+#include "Input/ButtonStates.h"
 
-namespace Input
+namespace Input::Devices
 {
 	void Mouse::update()
 	{
 		m_Axes[Axes::MouseWheelX] = 0.0f;
 		m_Axes[Axes::MouseWheelY] = 0.0f;
 
-		for (std::size_t i = 0; i < s_MaxMouseButtons; ++i)
+		for (std::size_t i = 0; i < c_MaxButtons; ++i)
 		{
 			auto& button = m_Buttons[i];
-			if (button & ButtonStates::ReleasedMask) // is button released
+			if (button & ButtonStates::ReleasedMask)
 				button = 0;
 			else
 				button &= ButtonStates::DownMask;
@@ -26,13 +26,19 @@ namespace Input
 
 	void Mouse::buttonPressed(std::uint32_t button)
 	{
-		if (button < s_MaxMouseButtons)
+		if (button < c_MaxButtons)
 			m_Buttons[button] |= ButtonStates::PressedMask | ButtonStates::DownMask;
+	}
+
+	void Mouse::buttonRepeated(std::uint32_t button)
+	{
+		if (button < c_MaxButtons)
+			m_Buttons[button] |= ButtonStates::RepeatedMask | ButtonStates::DownMask;
 	}
 
 	void Mouse::buttonReleased(std::uint32_t button)
 	{
-		if (button < s_MaxMouseButtons)
+		if (button < c_MaxButtons)
 			m_Buttons[button] |= ButtonStates::ReleasedMask;
 	}
 
@@ -43,21 +49,26 @@ namespace Input
 
 	std::uint8_t Mouse::getState(std::uint32_t button) const
 	{
-		return button < s_MaxMouseButtons ? m_Buttons[button] : 0;
+		return button < c_MaxButtons ? m_Buttons[button] : 0;
 	}
 
 	bool Mouse::isButtonPressed(std::uint32_t button) const
 	{
-		return button < s_MaxMouseButtons ? m_Buttons[button] & ButtonStates::PressedMask : false;
+		return button < c_MaxButtons ? m_Buttons[button] & ButtonStates::PressedMask : false;
+	}
+
+	bool Mouse::isButtonRepeated(std::uint32_t button) const
+	{
+		return button < c_MaxButtons ? m_Buttons[button] & ButtonStates::RepeatedMask : false;
 	}
 
 	bool Mouse::isButtonReleased(std::uint32_t button) const
 	{
-		return button < s_MaxMouseButtons ? m_Buttons[button] & ButtonStates::ReleasedMask : false;
+		return button < c_MaxButtons ? m_Buttons[button] & ButtonStates::ReleasedMask : false;
 	}
 
 	bool Mouse::isButtonDown(std::uint32_t button) const
 	{
-		return button < s_MaxMouseButtons ? m_Buttons[button] & ButtonStates::DownMask : false;
+		return button < c_MaxButtons ? m_Buttons[button] & ButtonStates::DownMask : false;
 	}
-} // namespace Input
+} // namespace Input::Devices

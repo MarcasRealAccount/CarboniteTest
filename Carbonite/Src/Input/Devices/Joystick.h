@@ -1,47 +1,52 @@
 #pragma once
 
+#include <cstdint>
+
 namespace Input
 {
-	class Joystick final
+	namespace Devices
 	{
-	public:
-		Joystick()  = default;
-		~Joystick() = default;
+		class Joystick final
+		{
+		public:
+			Joystick()  = default;
+			~Joystick() = default;
 
-		void setID(std::uint32_t id) { m_ID = id; }
-		void setGamepad() { m_IsGamepad = true; }
+			void setID(std::uint32_t id) { m_ID = id; }
+			void setGamepad() { m_IsGamepad = true; }
 
-		void resizeAxises(std::uint32_t axises);
-		void resizeButtons(std::uint32_t buttons);
+			void resizeAxises(std::uint32_t axises);
+			void resizeButtons(std::uint32_t buttons);
 
-		void setAxis(std::uint32_t axis, float value);
+			void setAxis(std::uint32_t axis, float value);
 
-		void buttonPressed(std::uint32_t button);
-		void buttonRepeated(std::uint32_t button);
-		void buttonReleased(std::uint32_t button);
+			void buttonPressed(std::uint32_t button);
+			void buttonRepeated(std::uint32_t button);
+			void buttonReleased(std::uint32_t button);
 
-		float getAxis(std::uint32_t axis) const;
+			float getAxis(std::uint32_t axis) const;
 
-		std::uint8_t getState(std::uint32_t button) const;
+			std::uint8_t getState(std::uint32_t button) const;
 
-		bool isButtonPressed(std::uint32_t button) const;
-		bool isButtonRepeated(std::uint32_t button) const;
-		bool isButtonReleased(std::uint32_t button) const;
-		bool isButtonDown(std::uint32_t button) const;
+			bool isButtonPressed(std::uint32_t button) const;
+			bool isButtonRepeated(std::uint32_t button) const;
+			bool isButtonReleased(std::uint32_t button) const;
+			bool isButtonDown(std::uint32_t button) const;
 
-		auto getID() const { return m_ID; }
-		bool isConnected() const { return m_ID != 0; }
-		auto isGamepad() const { return m_IsGamepad; }
-		auto getAxisCount() const { return m_Axes.size(); }
-		auto getButtonCount() const { return m_Buttons.size(); }
+			auto getID() const { return m_ID; }
+			bool isConnected() const { return m_ID != 0; }
+			auto isGamepad() const { return m_IsGamepad; }
+			auto getAxisCount() const { return m_Axes.size(); }
+			auto getButtonCount() const { return m_Buttons.size(); }
 
-	private:
-		std::uint32_t m_ID        = 0;
-		bool          m_IsGamepad = false;
+		private:
+			std::uint32_t m_ID        = 0;
+			bool          m_IsGamepad = false;
 
-		std::vector<float>        m_Axes;
-		std::vector<std::uint8_t> m_Buttons;
-	};
+			std::vector<float>        m_Axes;
+			std::vector<std::uint8_t> m_Buttons;
+		};
+	} // namespace Devices
 
 	namespace Buttons
 	{

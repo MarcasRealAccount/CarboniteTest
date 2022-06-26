@@ -1,7 +1,7 @@
 #include "Joystick.h"
-#include "ButtonStates.h"
+#include "Input/ButtonStates.h"
 
-namespace Input
+namespace Input::Devices
 {
 	void Joystick::resizeAxises(std::uint32_t axises)
 	{
@@ -66,4 +66,4 @@ namespace Input
 	{
 		return button < m_Buttons.size() ? m_Buttons[button] & ButtonStates::DownMask : false;
 	}
-} // namespace Input
+} // namespace Input::Device

@@ -1,34 +1,42 @@
 #pragma once
 
+#include <cstdint>
+
 namespace Input
 {
-	static constexpr std::size_t s_MaxMouseButtons = 8;
-
-	class Mouse final
+	namespace Devices
 	{
-	public:
-		Mouse()  = default;
-		~Mouse() = default;
+		class Mouse final
+		{
+		public:
+			static constexpr std::size_t c_MaxButtons = 8;
 
-		void update();
+		public:
+			Mouse()  = default;
+			~Mouse() = default;
 
-		void setAxis(std::uint32_t axis, float value);
+			void update();
 
-		void buttonPressed(std::uint32_t button);
-		void buttonReleased(std::uint32_t button);
+			void setAxis(std::uint32_t axis, float value);
 
-		float getAxis(std::uint32_t axis) const;
+			void buttonPressed(std::uint32_t button);
+			void buttonRepeated(std::uint32_t button);
+			void buttonReleased(std::uint32_t button);
 
-		std::uint8_t getState(std::uint32_t button) const;
+			float getAxis(std::uint32_t axis) const;
 
-		bool isButtonPressed(std::uint32_t button) const;
-		bool isButtonReleased(std::uint32_t button) const;
-		bool isButtonDown(std::uint32_t button) const;
+			std::uint8_t getState(std::uint32_t button) const;
 
-	private:
-		float        m_Axes[4] { 0.0f };
-		std::uint8_t m_Buttons[s_MaxMouseButtons] { 0 };
-	};
+			bool isButtonPressed(std::uint32_t button) const;
+			bool isButtonRepeated(std::uint32_t button) const;
+			bool isButtonReleased(std::uint32_t button) const;
+			bool isButtonDown(std::uint32_t button) const;
+
+		private:
+			float        m_Axes[4] { 0.0f };
+			std::uint8_t m_Buttons[c_MaxButtons] { 0 };
+		};
+	} // namespace Devices
 
 	namespace Buttons
 	{

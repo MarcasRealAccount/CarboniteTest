@@ -48,7 +48,7 @@ void Window::SizeCallback(GLFWwindow* window, int width, int height)
 {
 	Window* wnd = static_cast<Window*>(glfwGetWindowUserPointer(window));
 
-	if (wnd->m_Data.m_Width != width || wnd->m_Data.m_Height != height)
+	if (wnd->m_Data.m_Width != static_cast<std::uint32_t>(width) || wnd->m_Data.m_Height != static_cast<std::uint32_t>(height))
 		wnd->e_Size(static_cast<std::uint32_t>(width), static_cast<std::uint32_t>(height));
 	wnd->m_Data.m_Width  = width;
 	wnd->m_Data.m_Height = height;
@@ -90,7 +90,7 @@ void Window::FBSizeCallback(GLFWwindow* window, int fbWidth, int fbHeight)
 {
 	Window* wnd = static_cast<Window*>(glfwGetWindowUserPointer(window));
 
-	if (wnd->m_Data.m_FBWidth != fbWidth || wnd->m_Data.m_FBHeight != fbHeight)
+	if (wnd->m_Data.m_FBWidth != static_cast<std::uint32_t>(fbWidth) || wnd->m_Data.m_FBHeight != static_cast<std::uint32_t>(fbHeight))
 		wnd->e_FBSize(static_cast<std::uint32_t>(fbWidth), static_cast<std::uint32_t>(fbHeight));
 	wnd->m_Data.m_FBWidth  = fbWidth;
 	wnd->m_Data.m_FBHeight = fbHeight;
@@ -104,7 +104,7 @@ void Window::KeyCallback([[maybe_unused]] GLFWwindow* window, int keycode, [[may
 		Input::Inputs::Get().keyPressed(static_cast<std::uint32_t>(keycode));
 		break;
 	case GLFW_REPEAT:
-		Input::Inputs::Get().keyRepeat(static_cast<std::uint32_t>(keycode));
+		Input::Inputs::Get().keyRepeated(static_cast<std::uint32_t>(keycode));
 		break;
 	case GLFW_RELEASE:
 		Input::Inputs::Get().keyReleased(static_cast<std::uint32_t>(keycode));
