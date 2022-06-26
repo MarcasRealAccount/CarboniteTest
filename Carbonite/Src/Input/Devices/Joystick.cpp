@@ -3,6 +3,23 @@
 
 namespace Input::Devices
 {
+	void Joystick::update()
+	{
+		if (m_ID == 0)
+			return;
+
+		for (std::size_t i = 0; i < m_Buttons.size(); ++i)
+		{
+			auto& button = m_Buttons[i];
+			// If button is released set the state to 0, I.e. not pressed, repeated, released or down
+			// otherwise set the state to be down if it already is down otherwise 0
+			if (button & ButtonStates::ReleasedMask)
+				button = 0;
+			else
+				button &= ButtonStates::DownMask;
+		}
+	}
+
 	void Joystick::resizeAxises(std::uint32_t axises)
 	{
 		m_Axes.resize(axises, 0.0f);
@@ -66,4 +83,4 @@ namespace Input::Devices
 	{
 		return button < m_Buttons.size() ? m_Buttons[button] & ButtonStates::DownMask : false;
 	}
-} // namespace Input::Device
+} // namespace Input::Devices

@@ -33,7 +33,7 @@ namespace Input
 		};
 	} // namespace Devices
 
-	namespace Buttons
+	namespace ButtonIndices
 	{
 		static constexpr std::uint32_t KeySpace        = 32;
 		static constexpr std::uint32_t KeyApostrophe   = 39;

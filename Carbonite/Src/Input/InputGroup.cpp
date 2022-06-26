@@ -49,6 +49,7 @@ namespace Input
 		{
 		case EBindingType::Axis:
 		{
+			// If the binding is an Axis we return either the direct or relative state of it
 			auto binding = info.m_Index < m_AxisBindings.size() ? &m_AxisBindings[info.m_Index] : nullptr;
 			if (!binding)
 				return 0.0f;
@@ -62,6 +63,7 @@ namespace Input
 		}
 		case EBindingType::ButtonAxis:
 		{
+			// If the binding is a ButtonAxis we just return the state
 			auto binding = info.m_Index < m_ButtonAxisBindings.size() ? &m_ButtonAxisBindings[info.m_Index] : nullptr;
 			if (!binding)
 				return 0.0f;
@@ -85,6 +87,7 @@ namespace Input
 		{
 		case EBindingType::Axis2D:
 		{
+			// If the binding is an Axis2D we return either the direct or relative state of it
 			auto binding = info.m_Index < m_Axis2DBindings.size() ? &m_Axis2DBindings[info.m_Index] : nullptr;
 			if (!binding)
 				return { 0.0f, 0.0f };
@@ -98,6 +101,7 @@ namespace Input
 		}
 		case EBindingType::ButtonAxis2D:
 		{
+			// If the binding is a ButtonAxis2D we just return the state
 			auto binding = info.m_Index < m_ButtonAxis2DBindings.size() ? &m_ButtonAxis2DBindings[info.m_Index] : nullptr;
 			if (!binding)
 				return { 0.0f, 0.0f };
@@ -121,6 +125,7 @@ namespace Input
 		{
 		case EBindingType::Axis3D:
 		{
+			// If the binding is an Axis3D we return either the direct or relative state of it
 			auto binding = info.m_Index < m_Axis3DBindings.size() ? &m_Axis3DBindings[info.m_Index] : nullptr;
 			if (!binding)
 				return { 0.0f, 0.0f, 0.0f };
@@ -134,6 +139,7 @@ namespace Input
 		}
 		case EBindingType::ButtonAxis3D:
 		{
+			// If the binding is a ButtonAxis3D we just return the state
 			auto binding = info.m_Index < m_ButtonAxis3DBindings.size() ? &m_ButtonAxis3DBindings[info.m_Index] : nullptr;
 			if (!binding)
 				return { 0.0f, 0.0f, 0.0f };
@@ -178,6 +184,7 @@ namespace Input
 		}
 		else
 		{
+			// If the InputGroup is disabled we want all the button states to be 0
 			for (auto& binding : m_ButtonBindings)
 				binding.m_State = 0;
 			for (auto& binding : m_ButtonAxisBindings)

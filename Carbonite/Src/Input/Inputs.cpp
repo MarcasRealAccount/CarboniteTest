@@ -26,6 +26,8 @@ namespace Input
 
 		m_Keyboard.update();
 		m_Mouse.update();
+		for (auto& joystick : m_Joysticks)
+			joystick.update();
 	}
 
 	void Inputs::postUpdate()
@@ -55,18 +57,18 @@ namespace Input
 
 	void Inputs::mouseMove(float x, float y)
 	{
-		m_Mouse.setAxis(Axes::MouseX, x);
-		m_Mouse.setAxis(Axes::MouseY, y);
-		setAxis(Binding { EInputLocation::Mouse, 0, Axes::MouseX }, x);
-		setAxis(Binding { EInputLocation::Mouse, 0, Axes::MouseY }, y);
+		m_Mouse.setAxis(AxisIndices::MouseX, x);
+		m_Mouse.setAxis(AxisIndices::MouseY, y);
+		setAxis(Axes::MouseX(), x);
+		setAxis(Axes::MouseY(), y);
 	}
 
 	void Inputs::mouseScroll(float x, float y)
 	{
-		m_Mouse.setAxis(Axes::MouseWheelX, x);
-		m_Mouse.setAxis(Axes::MouseWheelY, y);
-		setAxis(Binding { EInputLocation::Mouse, 0, Axes::MouseWheelX }, x);
-		setAxis(Binding { EInputLocation::Mouse, 0, Axes::MouseWheelY }, y);
+		m_Mouse.setAxis(AxisIndices::MouseWheelX, x);
+		m_Mouse.setAxis(AxisIndices::MouseWheelY, y);
+		setAxis(Axes::MouseWheelX(), x);
+		setAxis(Axes::MouseWheelY(), y);
 	}
 
 	void Inputs::mouseButtonPressed(std::uint32_t button)
@@ -107,6 +109,8 @@ namespace Input
 
 		auto& joystick = m_Joysticks[index];
 		joystick.setID(0);
+		joystick.resizeAxises(0);
+		joystick.resizeButtons(0);
 	}
 
 	void Inputs::joystickAxis(std::uint32_t index, std::uint32_t id, std::uint32_t axis, float value)

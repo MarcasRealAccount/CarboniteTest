@@ -15,21 +15,28 @@ namespace Input
 	inline bool IsGroupEnabled(const std::string& name) { return Inputs::Get().isGroupEnabled(name); }
 
 	inline bool         Button(const std::string& name);
+	inline bool         Button(Binding button);
 	inline bool         Button(const std::string& group, const std::string& name);
 	inline std::uint8_t ButtonState(const std::string& name);
+	inline std::uint8_t ButtonState(Binding button);
 	inline std::uint8_t ButtonState(const std::string& group, const std::string& name);
 	inline bool         ButtonPressed(const std::string& name);
+	inline bool         ButtonPressed(Binding button);
 	inline bool         ButtonPressed(const std::string& group, const std::string& name);
 	inline bool         ButtonRepeated(const std::string& name);
+	inline bool         ButtonRepeated(Binding button);
 	inline bool         ButtonRepeated(const std::string& group, const std::string& name);
 	inline bool         ButtonReleased(const std::string& name);
+	inline bool         ButtonReleased(Binding button);
 	inline bool         ButtonReleased(const std::string& group, const std::string& name);
-	inline float        Axis(const std::string& name);
-	inline float        Axis(const std::string& group, const std::string& name);
-	inline glm::fvec2   Axis2D(const std::string& name);
-	inline glm::fvec2   Axis2D(const std::string& group, const std::string& name);
-	inline glm::fvec3   Axis3D(const std::string& name);
-	inline glm::fvec3   Axis3D(const std::string& group, const std::string& name);
+
+	inline float      Axis(const std::string& name);
+	inline float      Axis(Binding button);
+	inline float      Axis(const std::string& group, const std::string& name);
+	inline glm::fvec2 Axis2D(const std::string& name);
+	inline glm::fvec2 Axis2D(const std::string& group, const std::string& name);
+	inline glm::fvec3 Axis3D(const std::string& name);
+	inline glm::fvec3 Axis3D(const std::string& group, const std::string& name);
 
 	template <Bindable T>
 	inline void RegisterBinding(const std::string& name, T&& binding);
@@ -43,6 +50,10 @@ namespace Input
 	inline void RegisterButtonBinding(std::string&& name, std::uint32_t button, EInputLocation location = EInputLocation::Keyboard, std::uint32_t id = 0);
 	inline void RegisterButtonBinding(const std::string& group, const std::string& name, std::uint32_t button, EInputLocation location = EInputLocation::Keyboard, std::uint32_t id = 0);
 	inline void RegisterButtonBinding(const std::string& group, std::string&& name, std::uint32_t button, EInputLocation location = EInputLocation::Keyboard, std::uint32_t id = 0);
+	inline void RegisterButtonBinding(const std::string& name, Binding button);
+	inline void RegisterButtonBinding(std::string&& name, Binding button);
+	inline void RegisterButtonBinding(const std::string& group, const std::string& name, Binding button);
+	inline void RegisterButtonBinding(const std::string& group, std::string&& name, Binding button);
 	inline void RegisterAxisBinding(const std::string& name, std::uint32_t axis, float sensitivity = 1.0f, EAxisMode mode = EAxisMode::Direct, EInputLocation location = EInputLocation::Mouse, std::uint32_t id = 0);
 	inline void RegisterAxisBinding(std::string&& name, std::uint32_t axis, float sensitivity = 1.0f, EAxisMode mode = EAxisMode::Direct, EInputLocation location = EInputLocation::Mouse, std::uint32_t id = 0);
 	inline void RegisterAxisBinding(const std::string& group, const std::string& name, std::uint32_t axis, float sensitivity = 1.0f, EAxisMode mode = EAxisMode::Direct, EInputLocation location = EInputLocation::Mouse, std::uint32_t id = 0);
@@ -72,21 +83,28 @@ namespace Input
 namespace Input
 {
 	inline bool         Button(const std::string& name) { return Inputs::Get().getButton(name); }
+	inline bool         Button(Binding button) { return Inputs::Get().getButtonState(button) & ButtonStates::DownMask; }
 	inline bool         Button(const std::string& group, const std::string& name) { return GetGroup(group)->getButton(name); }
 	inline std::uint8_t ButtonState(const std::string& name) { return Inputs::Get().InputGroup::getButtonState(name); }
+	inline std::uint8_t ButtonState(Binding button) { return Inputs::Get().getButtonState(button); }
 	inline std::uint8_t ButtonState(const std::string& group, const std::string& name) { return GetGroup(group)->InputGroup::getButtonState(name); }
 	inline bool         ButtonPressed(const std::string& name) { return ButtonState(name) & ButtonStates::PressedMask; }
+	inline bool         ButtonPressed(Binding button) { return ButtonState(button) & ButtonStates::PressedMask; }
 	inline bool         ButtonPressed(const std::string& group, const std::string& name) { return ButtonState(group, name) & ButtonStates::PressedMask; }
 	inline bool         ButtonRepeated(const std::string& name) { return ButtonState(name) & ButtonStates::RepeatedMask; }
+	inline bool         ButtonRepeated(Binding button) { return ButtonState(button) & ButtonStates::RepeatedMask; }
 	inline bool         ButtonRepeated(const std::string& group, const std::string& name) { return ButtonState(group, name) & ButtonStates::RepeatedMask; }
 	inline bool         ButtonReleased(const std::string& name) { return ButtonState(name) & ButtonStates::ReleasedMask; }
+	inline bool         ButtonReleased(Binding button) { return ButtonState(button) & ButtonStates::ReleasedMask; }
 	inline bool         ButtonReleased(const std::string& group, const std::string& name) { return ButtonState(group, name) & ButtonStates::ReleasedMask; }
-	inline float        Axis(const std::string& name) { return Inputs::Get().getAxis(name); }
-	inline float        Axis(const std::string& group, const std::string& name) { return GetGroup(group)->getAxis(name); }
-	inline glm::fvec2   Axis2D(const std::string& name) { return Inputs::Get().getAxis2D(name); }
-	inline glm::fvec2   Axis2D(const std::string& group, const std::string& name) { return GetGroup(group)->getAxis2D(name); }
-	inline glm::fvec3   Axis3D(const std::string& name) { return Inputs::Get().getAxis3D(name); }
-	inline glm::fvec3   Axis3D(const std::string& group, const std::string& name) { return GetGroup(group)->getAxis3D(name); }
+
+	inline float      Axis(const std::string& name) { return Inputs::Get().getAxis(name); }
+	inline float      Axis(Binding axis) { return Inputs::Get().getAxisState(axis); }
+	inline float      Axis(const std::string& group, const std::string& name) { return GetGroup(group)->getAxis(name); }
+	inline glm::fvec2 Axis2D(const std::string& name) { return Inputs::Get().getAxis2D(name); }
+	inline glm::fvec2 Axis2D(const std::string& group, const std::string& name) { return GetGroup(group)->getAxis2D(name); }
+	inline glm::fvec3 Axis3D(const std::string& name) { return Inputs::Get().getAxis3D(name); }
+	inline glm::fvec3 Axis3D(const std::string& group, const std::string& name) { return GetGroup(group)->getAxis3D(name); }
 
 	template <Bindable T>
 	inline void RegisterBinding(const std::string& name, T&& binding)
@@ -132,6 +150,28 @@ namespace Input
 	{
 		std::string copy = name;
 		RegisterBinding(group, std::move(copy), ButtonBinding { std::move(name), Binding { location, id, button } });
+	}
+
+	inline void RegisterButtonBinding(const std::string& name, Binding button)
+	{
+		RegisterBinding(name, ButtonBinding { name, button });
+	}
+
+	inline void RegisterButtonBinding(std::string&& name, Binding button)
+	{
+		std::string copy = name;
+		RegisterBinding(std::move(copy), ButtonBinding { std::move(name), button });
+	}
+
+	inline void RegisterButtonBinding(const std::string& group, const std::string& name, Binding button)
+	{
+		RegisterBinding(group, name, ButtonBinding { name, button });
+	}
+
+	inline void RegisterButtonBinding(const std::string& group, std::string&& name, Binding button)
+	{
+		std::string copy = name;
+		RegisterBinding(group, std::move(copy), ButtonBinding { std::move(name), button });
 	}
 
 	inline void RegisterAxisBinding(const std::string& name, std::uint32_t axis, float sensitivity, EAxisMode mode, EInputLocation location, std::uint32_t id)

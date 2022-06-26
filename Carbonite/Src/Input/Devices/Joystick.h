@@ -15,6 +15,8 @@ namespace Input
 			void setID(std::uint32_t id) { m_ID = id; }
 			void setGamepad() { m_IsGamepad = true; }
 
+			void update();
+
 			void resizeAxises(std::uint32_t axises);
 			void resizeButtons(std::uint32_t buttons);
 
@@ -48,7 +50,7 @@ namespace Input
 		};
 	} // namespace Devices
 
-	namespace Buttons
+	namespace ButtonIndices
 	{
 		static constexpr std::uint32_t GamepadA           = 0;
 		static constexpr std::uint32_t GamepadB           = 1;
@@ -69,9 +71,9 @@ namespace Input
 		static constexpr std::uint32_t GamepadCircle      = GamepadB;
 		static constexpr std::uint32_t GamepadSquare      = GamepadX;
 		static constexpr std::uint32_t GamepadTriangle    = GamepadY;
-	} // namespace Buttons
+	} // namespace ButtonIndices
 
-	namespace Axes
+	namespace AxisIndices
 	{
 		static constexpr std::uint32_t GamepadLeftX        = 0;
 		static constexpr std::uint32_t GamepadLeftY        = 1;
@@ -79,5 +81,5 @@ namespace Input
 		static constexpr std::uint32_t GamepadRightY       = 3;
 		static constexpr std::uint32_t GamepadLeftTrigger  = 4;
 		static constexpr std::uint32_t GamepadRightTrigger = 5;
-	} // namespace Axes
+	} // namespace AxisIndices
 } // namespace Input

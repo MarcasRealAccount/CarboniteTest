@@ -38,7 +38,7 @@ namespace Input
 		};
 	} // namespace Devices
 
-	namespace Buttons
+	namespace ButtonIndices
 	{
 		static constexpr std::uint32_t Mouse1      = 0;
 		static constexpr std::uint32_t Mouse2      = 1;
@@ -53,7 +53,7 @@ namespace Input
 		static constexpr std::uint32_t MouseMiddle = Mouse3;
 	} // namespace Buttons
 
-	namespace Axes
+	namespace AxisIndices
 	{
 		static constexpr std::uint32_t MouseX      = 0;
 		static constexpr std::uint32_t MouseY      = 1;

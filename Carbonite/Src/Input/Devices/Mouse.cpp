@@ -5,12 +5,15 @@ namespace Input::Devices
 {
 	void Mouse::update()
 	{
-		m_Axes[Axes::MouseWheelX] = 0.0f;
-		m_Axes[Axes::MouseWheelY] = 0.0f;
+		// Reset the wheel axes to 0.0f
+		m_Axes[AxisIndices::MouseWheelX] = 0.0f;
+		m_Axes[AxisIndices::MouseWheelY] = 0.0f;
 
 		for (std::size_t i = 0; i < c_MaxButtons; ++i)
 		{
 			auto& button = m_Buttons[i];
+			// If button is released set the state to 0, I.e. not pressed, repeated, released or down
+			// otherwise set the state to be down if it already is down otherwise 0
 			if (button & ButtonStates::ReleasedMask)
 				button = 0;
 			else

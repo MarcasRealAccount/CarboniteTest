@@ -8,6 +8,8 @@ namespace Input::Devices
 		for (std::size_t i = 0; i < c_MaxKeys; ++i)
 		{
 			auto& key = m_Keys[i];
+			// If key is released set the state to 0, I.e. not pressed, repeated, released or down
+			// otherwise set the state to be down if it already is down otherwise 0
 			if (key & ButtonStates::ReleasedMask)
 				key = 0;
 			else

@@ -66,21 +66,21 @@ void Carbonite::init()
 
 	m_Device = m_Instance->createDevice(m_Surface.get());
 
-	Input::RegisterButtonBinding("toggleFullscreen", Input::Buttons::KeyF11);
-	Input::RegisterButtonBinding("close", Input::Buttons::KeyEscape);
-	Input::RegisterButtonBinding("toggleMenu", Input::Buttons::KeyI);
+	Input::RegisterButtonBinding("toggleFullscreen", Input::Buttons::KeyF11());
+	Input::RegisterButtonBinding("close", Input::Buttons::KeyEscape());
+	Input::RegisterButtonBinding("toggleMenu", Input::Buttons::KeyI());
 	Input::RegisterButtonAxis3DBinding("onFoot",
 	                                   "movement",
-	                                   Input::Binding { Input::EInputLocation::Keyboard, 0, Input::Buttons::KeyW },
-	                                   Input::Binding { Input::EInputLocation::Keyboard, 0, Input::Buttons::KeyS },
-	                                   Input::Binding { Input::EInputLocation::Keyboard, 0, Input::Buttons::KeyD },
-	                                   Input::Binding { Input::EInputLocation::Keyboard, 0, Input::Buttons::KeyA },
-	                                   Input::Binding { Input::EInputLocation::Keyboard, 0, Input::Buttons::KeyE },
-	                                   Input::Binding { Input::EInputLocation::Keyboard, 0, Input::Buttons::KeyQ });
+	                                   Input::Buttons::KeyW(),
+	                                   Input::Buttons::KeyS(),
+	                                   Input::Buttons::KeyD(),
+	                                   Input::Buttons::KeyA(),
+	                                   Input::Buttons::KeyE(),
+	                                   Input::Buttons::KeyQ());
 	Input::RegisterAxis2DBinding("onFoot",
 	                             "turn",
-	                             Input::Binding { Input::EInputLocation::Gamepad, 0, Input::Axes::GamepadRightX },
-	                             Input::Binding { Input::EInputLocation::Gamepad, 0, Input::Axes::GamepadRightY },
+	                             Input::Axes::GamepadRightX(),
+	                             Input::Axes::GamepadRightY(),
 	                             Input::EAxisMode::Relative);
 }
 
