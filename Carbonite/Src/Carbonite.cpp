@@ -1,6 +1,11 @@
 #include "Carbonite.h"
 #include "Input/Input.h"
+#include "Renderer/RHI/IDevice.h"
+#include "Renderer/RHI/IInstance.h"
+#include "Renderer/RHI/IRHI.h"
+#include "Renderer/RHI/ISurface.h"
 #include "Renderer/RHISelector.h"
+#include "Utils/Exception.h"
 #include "Utils/Log.h"
 
 Carbonite& Carbonite::Get()
@@ -58,13 +63,15 @@ void Carbonite::init()
 
 	initJoysticks();
 
-	m_Instance = Renderer::SelectRHI();
-	m_Surface  = m_Instance->createSurface(m_Window);
+	m_Instance = Renderer::GetRHI()->newInstance("Instance");
+	m_Surface  = m_Instance->newSurface(m_Window);
+	m_Device   = m_Instance->newDevice();
 
-	if (!m_Window.create())
-		throw std::runtime_error("Failed to create window!");
-
-	m_Device = m_Instance->createDevice(m_Surface.get());
+	if (!m_Instance->create()) throw Utils::Exception("Failed to create instance!");
+	if (!m_Window.create()) throw Utils::Exception("Failed to create window!");
+	if (!m_Surface->create()) throw Utils::Exception("Failed to create surface!");
+	if (!m_Device->create()) throw Utils::Exception("Failed to create device!");
+	Log::GetOrCreateLogger("RHI")->trace("Selected device '{}'", m_Device->getName());
 
 	Input::CreateGroup("onFoot");
 	Input::RegisterButtonBinding("toggleFullscreen", Input::Buttons::KeyF11());
@@ -111,9 +118,6 @@ void Carbonite::run()
 				m_Window.fullscreen();
 		}
 
-		m_Device->beginRendering();
-
-		m_Device->endRendering();
 
 		Input::Inputs::Get().update();
 		glfwPollEvents();
@@ -129,10 +133,10 @@ void Carbonite::deinit()
 {
 	Log::Trace("Deinit");
 
-	m_Device->destroy();
+	Renderer::GetRHI()->destroy();
 	m_Window.destroy();
-	m_Surface->destroy();
-	m_Instance->destroy();
+
+	Input::Inputs::Destroy();
 }
 
 void Carbonite::initJoysticks()

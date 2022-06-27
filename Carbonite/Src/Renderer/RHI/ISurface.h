@@ -1,32 +1,29 @@
 #pragma once
 
+#include "ForwardDecl.h"
+#include "RHINode.h"
+
+#include <concepts>
+#include <memory>
+
 class Window;
 
 namespace Renderer::RHI
 {
-	class IDevice;
-
-	class ISurface
+	class ISurface : public RHINode
 	{
 	public:
-		friend IDevice;
+		ISurface(IInstance* instance, Window* window);
 
-	public:
-		ISurface(Window* window);
-		ISurface(const ISurface&) = delete;
-		ISurface(ISurface&&)      = delete;
-		virtual ~ISurface()       = default;
-
-		virtual void destroy() = 0;
-
-		virtual void setWindowHints() = 0;
-
+		template <std::derived_from<IInstance> T>
+		T* getInstance() const
+		{
+			return static_cast<T*>(m_Instance);
+		}
 		auto getWindow() const { return m_Window; }
-		auto getDevice() const { return m_Device; }
 
-	protected:
-		Window* m_Window;
-
-		IDevice* m_Device;
+	private:
+		IInstance* m_Instance;
+		Window*    m_Window;
 	};
 } // namespace Renderer::RHI

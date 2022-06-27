@@ -4,29 +4,25 @@
 #include <spdlog/sinks/daily_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-namespace
-{
-	static std::vector<spdlog::sink_ptr>   s_Sinks;
-	static std::shared_ptr<spdlog::logger> s_MainLogger = nullptr;
-} // namespace
-
 namespace Log
 {
-	static void SetupSinks()
+	static auto& GetSinks()
 	{
-		if (!s_Sinks.empty())
-			return;
+		static auto s_Sinks = new std::vector<spdlog::sink_ptr>();
+
+		if (!s_Sinks->empty())
+			return *s_Sinks;
 
 		if constexpr (Core::s_IsConfigDebug)
-			s_Sinks.push_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>());
-		s_Sinks.push_back(std::make_shared<spdlog::sinks::daily_file_sink_mt>("Logs/Log", 23, 59));
+			s_Sinks->push_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>());
+		s_Sinks->push_back(std::make_shared<spdlog::sinks::daily_file_sink_mt>("Logs/Log", 23, 59));
+		return *s_Sinks;
 	}
 
 	std::shared_ptr<spdlog::logger> CreateLogger(const std::string& name)
 	{
-		SetupSinks();
-
-		std::shared_ptr<spdlog::logger> logger = std::make_shared<spdlog::logger>(name.substr(0, std::min<std::uint64_t>(name.size(), 16ULL)), s_Sinks.begin(), s_Sinks.end());
+		auto&                           sinks  = GetSinks();
+		std::shared_ptr<spdlog::logger> logger = std::make_shared<spdlog::logger>(name.substr(0, std::min<std::uint64_t>(name.size(), 16ULL)), sinks.begin(), sinks.end());
 		logger->set_pattern("[%T.%f][%16n][%^%8l%$][%7t] %v");
 
 		if constexpr (Core::s_IsConfigDist)
@@ -40,8 +36,7 @@ namespace Log
 
 	std::shared_ptr<spdlog::logger> GetMainLogger()
 	{
-		if (!s_MainLogger)
-			s_MainLogger = CreateLogger("Carbonite");
+		static auto s_MainLogger = CreateLogger("Carbonite");
 		return s_MainLogger;
 	}
 

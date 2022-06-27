@@ -4,17 +4,9 @@
 
 namespace Renderer::OpenGL
 {
-	class Surface : public RHI::ISurface
+	class Surface final : public RHI::ISurface
 	{
 	public:
-		Surface(Window* window);
-		virtual ~Surface() = default;
-
-		virtual void destroy() override {}
-
-		void makeContextCurrent();
-		void swapBuffers();
-
-		virtual void setWindowHints() override;
+		Surface(RHI::IInstance* instance, Window* window);
 	};
 } // namespace Renderer::OpenGL

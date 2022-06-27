@@ -1,8 +1,6 @@
 #pragma once
 
-#include "Renderer/RHI/IDevice.h"
-#include "Renderer/RHI/IInstance.h"
-#include "Renderer/RHI/ISurface.h"
+#include "Renderer/RHI/ForwardDecl.h"
 #include "Window/Window.h"
 
 class Carbonite final

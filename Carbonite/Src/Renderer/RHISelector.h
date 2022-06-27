@@ -1,8 +1,10 @@
 #pragma once
 
-#include "Renderer/RHI/IInstance.h"
+#include "Renderer/RHI/ForwardDecl.h"
 
 namespace Renderer
 {
-	std::unique_ptr<RHI::IInstance> SelectRHI();
-}
+	void RegisterRHI(std::unique_ptr<RHI::IRHI>&& rhi);
+
+	RHI::IRHI* GetRHI();
+} // namespace Renderer

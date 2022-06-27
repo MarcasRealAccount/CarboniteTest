@@ -4,17 +4,13 @@
 
 namespace Renderer::OpenGL
 {
-	class Device : public RHI::IDevice
+	class Device final : public RHI::IDevice
 	{
 	public:
-		Device(RHI::ISurface* surface);
-		virtual ~Device() = default;
+		Device(RHI::IInstance* instance);
 
-		virtual void destroy() override {}
-
-		void makeContextCurrent();
-
-		virtual void beginRendering() override;
-		virtual void endRendering() override;
+	private:
+		virtual void createImpl() override;
+		virtual void destroyImpl() override;
 	};
 } // namespace Renderer::OpenGL

@@ -1,5 +1,7 @@
 #include "Window.h"
 #include "Input/Input.h"
+#include "Renderer/RHI/IInstance.h"
+#include "Renderer/RHI/IRHI.h"
 #include "Renderer/RHI/ISurface.h"
 #include "Utils/Log.h"
 
@@ -272,7 +274,7 @@ bool Window::create()
 	glfwDefaultWindowHints();
 	if (!m_Surface)
 		throw std::runtime_error("Window::create() expected surface to be created first!");
-	m_Surface->setWindowHints();
+	m_Surface->getInstance<Renderer::RHI::IInstance>()->getRHI<Renderer::RHI::IRHI>()->setWindowHints(*this);
 
 	GLFWmonitor* monitor = getBestMonitor();
 
@@ -293,11 +295,11 @@ bool Window::create()
 
 		m_PData = m_Data;
 
-		m_Native = glfwCreateWindow(vidmode->width, vidmode->height, m_Title.c_str(), monitor, nullptr);
+		m_Native = glfwCreateWindow(vidmode->width, vidmode->height, m_Title.c_str(), monitor, m_Share);
 	}
 	else
 	{
-		m_Native = glfwCreateWindow(m_Data.m_Width, m_Data.m_Height, m_Title.c_str(), nullptr, nullptr);
+		m_Native = glfwCreateWindow(m_Data.m_Width, m_Data.m_Height, m_Title.c_str(), nullptr, m_Share);
 	}
 
 	if (!m_Native)

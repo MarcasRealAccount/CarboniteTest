@@ -1,15 +1,12 @@
 #pragma once
 
+#include "Renderer/RHI/ForwardDecl.h"
 #include "Utils/Event.h"
 
 #include <cstdint>
 
+#include <concepts>
 #include <string>
-
-namespace Renderer::RHI
-{
-	class ISurface;
-}
 
 struct GLFWwindow;
 struct GLFWmonitor;
@@ -64,6 +61,7 @@ public:
 	void setSize(std::uint32_t width, std::uint32_t height);
 	void setTitle(const std::string& title);
 	void setTitle(std::string&& title);
+	void setShare(GLFWwindow* share) { m_Share = share; }
 
 	void restore();
 	void iconify();
@@ -85,7 +83,12 @@ public:
 	bool  isFullscreen() const { return m_Data.m_State == EWindowState::Fullscreen; }
 	auto& getTitle() const { return m_Title; }
 	auto  getNative() const { return m_Native; }
-	auto  getSurface() const { return m_Surface; }
+	auto  getShare() const { return m_Share; }
+	template <std::derived_from<Renderer::RHI::ISurface> T>
+	T* getSurface() const
+	{
+		return static_cast<T*>(m_Surface);
+	}
 
 private:
 	WindowData m_Data;
@@ -94,6 +97,7 @@ private:
 	std::string m_Title;
 
 	GLFWwindow* m_Native;
+	GLFWwindow* m_Share;
 
 	Renderer::RHI::ISurface* m_Surface;
 };

@@ -1,16 +1,13 @@
 #include "ISurface.h"
-#include "Utils/Core.h"
+#include "IInstance.h"
 #include "Window/Window.h"
-
-#include <stdexcept>
 
 namespace Renderer::RHI
 {
-	ISurface::ISurface(Window* window)
-	    : m_Window(window), m_Device(nullptr)
+	ISurface::ISurface(IInstance* instance, Window* window)
+	    : RHINode("Window"), m_Instance(instance), m_Window(window)
 	{
-		if (!window)
-			throw std::runtime_error("Renderer::RHI::ISurface expects window to not be nullptr!");
-		window->m_Surface = this;
+		m_Window->m_Surface = this;
+		m_Instance->attachChild(this);
 	}
 } // namespace Renderer::RHI

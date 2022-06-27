@@ -1,25 +1,28 @@
 #pragma once
 
+#include "ForwardDecl.h"
+#include "RHINode.h"
+
+#include <concepts>
+#include <memory>
+
 namespace Renderer::RHI
 {
-	class ISurface;
-
-	class IDevice
+	class IDevice : public RHINode
 	{
 	public:
-		IDevice(ISurface* surface);
-		IDevice(const IDevice&) = delete;
-		IDevice(IDevice&&)      = delete;
-		virtual ~IDevice()      = default;
+		IDevice(const std::string& name, IInstance* instance);
+		IDevice(std::string&& name, IInstance* instance);
 
-		virtual void destroy() = 0;
+		virtual bool supportsRayTracing() const { return false; }
 
-		virtual void beginRendering() = 0;
-		virtual void endRendering()   = 0;
-
-		auto getSurface() const { return m_Surface; }
+		template <std::derived_from<IInstance> T>
+		T* getInstance() const
+		{
+			return static_cast<T*>(m_Instance);
+		}
 
 	protected:
-		ISurface* m_Surface;
+		IInstance* m_Instance;
 	};
 } // namespace Renderer::RHI

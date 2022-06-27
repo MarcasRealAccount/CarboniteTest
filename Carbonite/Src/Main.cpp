@@ -1,5 +1,6 @@
 #include "Carbonite.h"
 #include "Utils/Core.h"
+#include "Utils/Exception.h"
 #include "Utils/Log.h"
 
 #include <stdexcept>
@@ -13,9 +14,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 			Carbonite::Get().run();
 			Carbonite::Destroy();
 		}
-		catch (const std::exception& e)
+		catch (const Utils::Exception& e)
 		{
-			Log::Critical("Critical exception caught {}", e.what());
+			Log::Critical("Critical exception caught {}", e);
 			return 1;
 		}
 	}
