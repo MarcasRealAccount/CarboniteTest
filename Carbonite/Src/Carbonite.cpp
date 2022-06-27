@@ -66,6 +66,7 @@ void Carbonite::init()
 
 	m_Device = m_Instance->createDevice(m_Surface.get());
 
+	Input::CreateGroup("onFoot");
 	Input::RegisterButtonBinding("toggleFullscreen", Input::Buttons::KeyF11());
 	Input::RegisterButtonBinding("close", Input::Buttons::KeyEscape());
 	Input::RegisterButtonBinding("toggleMenu", Input::Buttons::KeyI());
@@ -90,6 +91,7 @@ void Carbonite::run()
 
 	Input::Inputs::Get().update();
 	glfwPollEvents();
+	updateJoysticks();
 	Input::Inputs::Get().postUpdate();
 
 	while (!m_Window.shouldClose())

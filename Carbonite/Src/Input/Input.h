@@ -147,7 +147,7 @@ namespace Input
 
 	inline void RegisterButtonBinding(std::string&& name, std::uint32_t button, EInputLocation location, std::uint32_t id)
 	{
-		std::string copy = name;
+		std::string copy = static_cast<const std::string&>(name);
 		RegisterBinding(std::move(copy), ButtonBinding { std::move(name), Binding { location, id, button } });
 	}
 
@@ -158,7 +158,7 @@ namespace Input
 
 	inline void RegisterButtonBinding(const std::string& group, std::string&& name, std::uint32_t button, EInputLocation location, std::uint32_t id)
 	{
-		std::string copy = name;
+		std::string copy = static_cast<const std::string&>(name);
 		RegisterBinding(group, std::move(copy), ButtonBinding { std::move(name), Binding { location, id, button } });
 	}
 
@@ -169,7 +169,7 @@ namespace Input
 
 	inline void RegisterButtonBinding(std::string&& name, Binding button)
 	{
-		std::string copy = name;
+		std::string copy = static_cast<const std::string&>(name);
 		RegisterBinding(std::move(copy), ButtonBinding { std::move(name), button });
 	}
 
@@ -180,7 +180,7 @@ namespace Input
 
 	inline void RegisterButtonBinding(const std::string& group, std::string&& name, Binding button)
 	{
-		std::string copy = name;
+		std::string copy = static_cast<const std::string&>(name);
 		RegisterBinding(group, std::move(copy), ButtonBinding { std::move(name), button });
 	}
 
@@ -191,7 +191,7 @@ namespace Input
 
 	inline void RegisterAxisBinding(std::string&& name, std::uint32_t axis, float sensitivity, EAxisMode mode, EInputLocation location, std::uint32_t id)
 	{
-		std::string copy = name;
+		std::string copy = static_cast<const std::string&>(name);
 		RegisterBinding(std::move(copy), AxisBinding { std::move(name), Binding { location, id, axis, sensitivity }, mode });
 	}
 
@@ -202,7 +202,7 @@ namespace Input
 
 	inline void RegisterAxisBinding(const std::string& group, std::string&& name, std::uint32_t axis, float sensitivity, EAxisMode mode, EInputLocation location, std::uint32_t id)
 	{
-		std::string copy = name;
+		std::string copy = static_cast<const std::string&>(name);
 		RegisterBinding(group, std::move(copy), AxisBinding { std::move(name), Binding { location, id, axis, sensitivity }, mode });
 	}
 
@@ -213,7 +213,7 @@ namespace Input
 
 	inline void RegisterAxisBinding(std::string&& name, Binding axis, EAxisMode mode)
 	{
-		std::string copy = name;
+		std::string copy = static_cast<const std::string&>(name);
 		RegisterBinding(std::move(copy), AxisBinding { std::move(name), axis, mode });
 	}
 
@@ -224,7 +224,7 @@ namespace Input
 
 	inline void RegisterAxisBinding(const std::string& group, std::string&& name, Binding axis, EAxisMode mode)
 	{
-		std::string copy = name;
+		std::string copy = static_cast<const std::string&>(name);
 		RegisterBinding(group, std::move(copy), AxisBinding { std::move(name), axis, mode });
 	}
 
@@ -235,7 +235,7 @@ namespace Input
 
 	inline void RegisterAxis2DBinding(std::string&& name, Binding xAxis, Binding yAxis, EAxisMode mode)
 	{
-		std::string copy = name;
+		std::string copy = static_cast<const std::string&>(name);
 		RegisterBinding(std::move(copy), Axis2DBinding { std::move(name), xAxis, yAxis, mode });
 	}
 
@@ -246,7 +246,7 @@ namespace Input
 
 	inline void RegisterAxis2DBinding(const std::string& group, std::string&& name, Binding xAxis, Binding yAxis, EAxisMode mode)
 	{
-		std::string copy = name;
+		std::string copy = static_cast<const std::string&>(name);
 		RegisterBinding(group, std::move(copy), Axis2DBinding { std::move(name), xAxis, yAxis, mode });
 	}
 
@@ -257,7 +257,7 @@ namespace Input
 
 	inline void RegisterAxis3DBinding(std::string&& name, Binding xAxis, Binding yAxis, Binding zAxis, EAxisMode mode)
 	{
-		std::string copy = name;
+		std::string copy = static_cast<const std::string&>(name);
 		RegisterBinding(std::move(copy), Axis3DBinding { std::move(name), xAxis, yAxis, zAxis, mode });
 	}
 
@@ -268,7 +268,7 @@ namespace Input
 
 	inline void RegisterAxis3DBinding(const std::string& group, std::string&& name, Binding xAxis, Binding yAxis, Binding zAxis, EAxisMode mode)
 	{
-		std::string copy = name;
+		std::string copy = static_cast<const std::string&>(name);
 		RegisterBinding(group, std::move(copy), Axis3DBinding { std::move(name), xAxis, yAxis, zAxis, mode });
 	}
 
@@ -279,7 +279,7 @@ namespace Input
 
 	inline void RegisterButtonAxisBinding(std::string&& name, Binding posButton, Binding negButton)
 	{
-		std::string copy = name;
+		std::string copy = static_cast<const std::string&>(name);
 		RegisterBinding(std::move(copy), ButtonAxisBinding { std::move(name), posButton, negButton });
 	}
 
@@ -290,7 +290,7 @@ namespace Input
 
 	inline void RegisterButtonAxisBinding(const std::string& group, std::string&& name, Binding posButton, Binding negButton)
 	{
-		std::string copy = name;
+		std::string copy = static_cast<const std::string&>(name);
 		RegisterBinding(group, std::move(copy), ButtonAxisBinding { std::move(name), posButton, negButton });
 	}
 
@@ -301,7 +301,7 @@ namespace Input
 
 	inline void RegisterButtonAxis2DBinding(std::string&& name, Binding posXButton, Binding negXButton, Binding posYButton, Binding negYButton)
 	{
-		std::string copy = name;
+		std::string copy = static_cast<const std::string&>(name);
 		RegisterBinding(std::move(copy), ButtonAxis2DBinding { std::move(name), posXButton, negXButton, posYButton, negYButton });
 	}
 
@@ -312,7 +312,7 @@ namespace Input
 
 	inline void RegisterButtonAxis2DBinding(const std::string& group, std::string&& name, Binding posXButton, Binding negXButton, Binding posYButton, Binding negYButton)
 	{
-		std::string copy = name;
+		std::string copy = static_cast<const std::string&>(name);
 		RegisterBinding(group, std::move(copy), ButtonAxis2DBinding { std::move(name), posXButton, negXButton, posYButton, negYButton });
 	}
 
@@ -323,7 +323,7 @@ namespace Input
 
 	inline void RegisterButtonAxis3DBinding(std::string&& name, Binding posXButton, Binding negXButton, Binding posYButton, Binding negYButton, Binding posZButton, Binding negZButton)
 	{
-		std::string copy = name;
+		std::string copy = static_cast<const std::string&>(name);
 		RegisterBinding(std::move(copy), ButtonAxis3DBinding { std::move(name), posXButton, negXButton, posYButton, negYButton, posZButton, negZButton });
 	}
 
@@ -334,7 +334,7 @@ namespace Input
 
 	inline void RegisterButtonAxis3DBinding(const std::string& group, std::string&& name, Binding posXButton, Binding negXButton, Binding posYButton, Binding negYButton, Binding posZButton, Binding negZButton)
 	{
-		std::string copy = name;
+		std::string copy = static_cast<const std::string&>(name);
 		RegisterBinding(group, std::move(copy), ButtonAxis3DBinding { std::move(name), posXButton, negXButton, posYButton, negYButton, posZButton, negZButton });
 	}
 } // namespace Input
