@@ -7,7 +7,9 @@ namespace Input
 {
 	inline InputGroup* GetGroup(const std::string& name) { return Inputs::Get().getGroup(name); }
 	inline InputGroup* CreateGroup(const std::string& name) { return Inputs::Get().createGroup(name); }
+	inline InputGroup* CreateGroup(std::string&& name) { return Inputs::Get().createGroup(std::move(name)); }
 	inline InputGroup* GetOrCreateGroup(const std::string& name) { return Inputs::Get().getOrCreateGroup(name); }
+	inline InputGroup* GetOrCreateGroup(std::string&& name) { return Inputs::Get().getOrCreateGroup(std::move(name)); }
 
 	inline void EnableGroup(const std::string& name) { Inputs::Get().enableGroup(name); }
 	inline void DisableGroup(const std::string& name) { Inputs::Get().disableGroup(name); }
@@ -31,11 +33,13 @@ namespace Input
 	inline bool         ButtonReleased(const std::string& group, const std::string& name);
 
 	inline float      Axis(const std::string& name);
-	inline float      Axis(Binding button);
+	inline float      Axis(Binding axis);
 	inline float      Axis(const std::string& group, const std::string& name);
 	inline glm::fvec2 Axis2D(const std::string& name);
+	inline glm::fvec2 Axis2D(Binding xAxis, Binding yAxis);
 	inline glm::fvec2 Axis2D(const std::string& group, const std::string& name);
 	inline glm::fvec3 Axis3D(const std::string& name);
+	inline glm::fvec3 Axis3D(Binding xAxis, Binding yAxis, Binding zAxis);
 	inline glm::fvec3 Axis3D(const std::string& group, const std::string& name);
 
 	template <Bindable T>
@@ -58,6 +62,10 @@ namespace Input
 	inline void RegisterAxisBinding(std::string&& name, std::uint32_t axis, float sensitivity = 1.0f, EAxisMode mode = EAxisMode::Direct, EInputLocation location = EInputLocation::Mouse, std::uint32_t id = 0);
 	inline void RegisterAxisBinding(const std::string& group, const std::string& name, std::uint32_t axis, float sensitivity = 1.0f, EAxisMode mode = EAxisMode::Direct, EInputLocation location = EInputLocation::Mouse, std::uint32_t id = 0);
 	inline void RegisterAxisBinding(const std::string& group, std::string&& name, std::uint32_t axis, float sensitivity = 1.0f, EAxisMode mode = EAxisMode::Direct, EInputLocation location = EInputLocation::Mouse, std::uint32_t id = 0);
+	inline void RegisterAxisBinding(const std::string& name, Binding axis, EAxisMode mode = EAxisMode::Direct);
+	inline void RegisterAxisBinding(std::string&& name, Binding axis, EAxisMode mode = EAxisMode::Direct);
+	inline void RegisterAxisBinding(const std::string& group, const std::string& name, Binding axis, EAxisMode mode = EAxisMode::Direct);
+	inline void RegisterAxisBinding(const std::string& group, std::string&& name, Binding axis, EAxisMode mode = EAxisMode::Direct);
 	inline void RegisterAxis2DBinding(const std::string& name, Binding xAxis, Binding yAxis, EAxisMode mode = EAxisMode::Direct);
 	inline void RegisterAxis2DBinding(std::string&& name, Binding xAxis, Binding yAxis, EAxisMode mode = EAxisMode::Direct);
 	inline void RegisterAxis2DBinding(const std::string& group, const std::string& name, Binding xAxis, Binding yAxis, EAxisMode mode = EAxisMode::Direct);
@@ -102,8 +110,10 @@ namespace Input
 	inline float      Axis(Binding axis) { return Inputs::Get().getAxisState(axis); }
 	inline float      Axis(const std::string& group, const std::string& name) { return GetGroup(group)->getAxis(name); }
 	inline glm::fvec2 Axis2D(const std::string& name) { return Inputs::Get().getAxis2D(name); }
+	inline glm::fvec2 Axis2D(Binding xAxis, Binding yAxis) { return glm::fvec2 { Axis(xAxis), Axis(yAxis) }; }
 	inline glm::fvec2 Axis2D(const std::string& group, const std::string& name) { return GetGroup(group)->getAxis2D(name); }
 	inline glm::fvec3 Axis3D(const std::string& name) { return Inputs::Get().getAxis3D(name); }
+	inline glm::fvec3 Axis3D(Binding xAxis, Binding yAxis, Binding zAxis) { return glm::fvec3 { Axis(xAxis), Axis(yAxis), Axis(zAxis) }; }
 	inline glm::fvec3 Axis3D(const std::string& group, const std::string& name) { return GetGroup(group)->getAxis3D(name); }
 
 	template <Bindable T>
@@ -194,6 +204,28 @@ namespace Input
 	{
 		std::string copy = name;
 		RegisterBinding(group, std::move(copy), AxisBinding { std::move(name), Binding { location, id, axis, sensitivity }, mode });
+	}
+
+	inline void RegisterAxisBinding(const std::string& name, Binding axis, EAxisMode mode)
+	{
+		RegisterBinding(name, AxisBinding { name, axis, mode });
+	}
+
+	inline void RegisterAxisBinding(std::string&& name, Binding axis, EAxisMode mode)
+	{
+		std::string copy = name;
+		RegisterBinding(std::move(copy), AxisBinding { std::move(name), axis, mode });
+	}
+
+	inline void RegisterAxisBinding(const std::string& group, const std::string& name, Binding axis, EAxisMode mode)
+	{
+		RegisterBinding(group, name, AxisBinding { name, axis, mode });
+	}
+
+	inline void RegisterAxisBinding(const std::string& group, std::string&& name, Binding axis, EAxisMode mode)
+	{
+		std::string copy = name;
+		RegisterBinding(group, std::move(copy), AxisBinding { std::move(name), axis, mode });
 	}
 
 	inline void RegisterAxis2DBinding(const std::string& name, Binding xAxis, Binding yAxis, EAxisMode mode)
